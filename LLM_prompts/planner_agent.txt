@@ -1,0 +1,164 @@
+You are an expert AI system architect and project planner specializing in Deep Learning and NLP systems.
+
+I am building a semester-level project titled:
+
+“Context-Aware Automatic Question Generation using Transformer-based Sequence Modeling”
+
+Your task is to design a COMPLETE, EXECUTABLE, and HIGH-QUALITY project plan under the following constraints and goals.
+
+---
+
+## 🎯 PROJECT OBJECTIVE
+
+Build an AI system that:
+
+* Takes a paragraph or document as input
+* Generates:
+
+  * Multiple types of questions (MCQs + short answer)
+  * Corresponding answers
+  * Difficulty level (easy / medium / hard)
+
+---
+
+## ⚠️ CONSTRAINTS (VERY IMPORTANT)
+
+* Total time: **3 weeks**
+* I want to implement as much logic as possible myself
+* Pretrained models (like T5/BART/BERT) should be used ONLY where necessary
+* Avoid over-reliance on APIs or black-box solutions
+* The system should demonstrate strong understanding of:
+
+  * Transformers
+  * NLP pipeline design
+  * Attention mechanisms
+  * Evaluation metrics
+
+---
+
+## 🧠 EXPECTED SYSTEM COMPONENTS
+
+Design the system with clear modular architecture including:
+
+1. Text Preprocessing Module
+2. Sentence Selection / Importance Ranking
+3. Question Generation Model (Transformer-based)
+4. Answer Extraction Module
+5. Difficulty Estimation Module (rule-based or learned)
+6. Evaluation Module (BLEU, ROUGE, etc.)
+7. Optional: API or UI layer
+
+---
+
+## 📊 DATASETS
+
+Use realistic and accessible datasets such as:
+
+* SQuAD
+* MS MARCO (optional)
+
+Explain:
+
+* How data will be preprocessed
+* What subset to use (since time is limited)
+* Input-output format for training
+
+---
+
+## 🏗️ WHAT I NEED FROM YOU
+
+Provide a structured response including:
+
+### 1. 📐 SYSTEM ARCHITECTURE
+
+* Clear pipeline (step-by-step data flow)
+* Interaction between modules
+
+### 2. 🧩 MODULE DESIGN
+
+For EACH module:
+
+* Purpose
+* What I should implement myself
+* What libraries (if any) to use
+* Key algorithms or logic
+
+### 3. 🤖 MODEL DESIGN
+
+* Whether to use pretrained model or build partial model
+* If pretrained:
+
+  * Which model (T5-small preferred)
+  * How to fine-tune efficiently
+* If custom:
+
+  * Architecture details (encoder-decoder, attention, etc.)
+
+### 4. 🗓️ 3-WEEK EXECUTION PLAN
+
+Break into:
+
+* Week 1: Foundation
+* Week 2: Core ML
+* Week 3: Integration + polishing
+
+Include daily-level granularity if possible.
+
+---
+
+### 5. 📁 PROJECT STRUCTURE
+
+Provide folder structure like:
+
+* data/
+* models/
+* preprocessing/
+* training/
+* evaluation/
+* app/
+
+---
+
+### 6. 🧪 EVALUATION STRATEGY
+
+* Metrics (BLEU, ROUGE, etc.)
+* How to measure quality of generated questions
+
+---
+
+### 7. 🚀 ENHANCEMENTS (IF TIME PERMITS)
+
+* Difficulty control improvements
+* Question diversity
+* Better ranking mechanisms
+
+---
+
+### 8. 💬 INTERVIEW PREPARATION
+
+List:
+
+* Key concepts I must understand deeply
+* Likely questions interviewers will ask
+
+---
+
+## 🚫 WHAT TO AVOID
+
+* Do NOT give vague suggestions
+* Do NOT overcomplicate with unnecessary research ideas
+* Do NOT suggest very large models or datasets
+* Do NOT rely entirely on APIs
+
+---
+
+## ✅ OUTPUT STYLE
+
+* Structured
+* Step-by-step
+* Practical and implementable
+* Focused on execution, not theory
+
+---
+
+Your goal is to help me build a **high-quality, interview-level project within 3 weeks** that stands out among typical college projects.

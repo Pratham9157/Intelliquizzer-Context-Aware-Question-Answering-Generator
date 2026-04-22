@@ -1,0 +1,13 @@
+1)This is my course syllabus, now we want to create an ambitious semester project using these concepts what can be some really good ideas of project.
+
+
+2)design me a prompt to give to a planner agent about the Question and answer gen ai based project we are continuing with.
+
+
+3)i have successfully generated the plan... now i want you to review it and then write me a prompt to give to coding agent...
+
+
+4)module 1 was implemented and tested... check it and if it looks nice then lets write the prompt for module 2
+
+
+5)

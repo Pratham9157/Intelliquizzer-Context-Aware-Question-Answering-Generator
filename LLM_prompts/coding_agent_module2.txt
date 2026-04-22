@@ -1,0 +1,150 @@
+You are a senior Python developer and NLP engineer.
+
+We are building a modular AI system for:
+“Context-Aware Automatic Question Generation using Transformer-based Sequence Modeling”
+
+Module 1 (Text Extraction) is already completed.
+
+Now implement:
+
+---
+
+# 🧩 MODULE 2 — TEXT PREPROCESSING MODULE
+
+## 🎯 OBJECTIVE
+
+Convert raw extracted text into clean, structured sentences suitable for NLP tasks.
+
+---
+
+## ⚠️ IMPLEMENTATION RULES
+
+* Write clean, modular, testable code
+* Do NOT use heavy libraries unnecessarily
+* Use NLTK only for sentence tokenization
+* All preprocessing logic should be explicitly implemented
+* Keep functions small and reusable
+
+---
+
+## 📁 FILE LOCATION
+
+Create file:
+
+preprocessing/preprocessor.py
+
+---
+
+## 🧠 FUNCTIONAL REQUIREMENTS
+
+### 1. Text Cleaning Function
+
+Implement:
+
+```python
+clean_text(text: str) -> str
+```
+
+Operations:
+
+* Unicode normalization (NFKD)
+* Remove:
+
+  * extra spaces
+  * special characters (except punctuation)
+  * bracketed text (e.g., [1], (info))
+* Normalize whitespace
+
+---
+
+### 2. Sentence Tokenization
+
+Implement:
+
+```python
+tokenize_sentences(text: str) -> List[str]
+```
+
+Requirements:
+
+* Use NLTK `sent_tokenize`
+* Remove very short sentences (< 6 words)
+* Preserve original casing
+
+---
+
+### 3. Noise Filtering
+
+Implement:
+
+```python
+filter_sentences(sentences: List[str]) -> List[str]
+```
+
+Remove:
+
+* Sentences with:
+
+  * too many numbers
+  * too many symbols
+  * low alphabetic ratio
+
+---
+
+### 4. Main Pipeline Function
+
+```python
+preprocess(text: str) -> List[str]
+```
+
+Pipeline:
+clean_text → tokenize → filter → return sentences
+
+---
+
+### 5. Utility Functions (IMPORTANT)
+
+Add helper functions:
+
+* is_noisy_sentence(sentence)
+* normalize_unicode(text)
+
+---
+
+## 🧪 TESTING REQUIREMENTS
+
+Provide:
+
+### test_preprocessor()
+
+Test cases:
+
+* messy text
+* academic paragraph
+* text with symbols/numbers
+* empty input
+
+---
+
+## 📌 OUTPUT FORMAT
+
+For this module, provide:
+
+1. File name
+2. Full code
+3. Explanation of logic
+4. Example usage
+5. Test output
+
+---
+
+## 🚫 DO NOT
+
+* Do NOT combine with other modules
+* Do NOT skip preprocessing steps
+* Do NOT use external APIs
+* Do NOT overcomplicate
+
+---
+
+After completing, STOP and wait for next module instruction.

@@ -1,0 +1,101 @@
+You are a senior ML engineer and software developer.
+
+I am building a modular AI system for:
+“Context-Aware Automatic Question Generation using Transformer-based Sequence Modeling”
+
+You will help me implement this project step-by-step with clean, production-quality code.
+
+---
+
+## ⚠️ IMPORTANT RULES
+
+* Do NOT generate the entire project at once
+* Work module-by-module
+* Wait for my confirmation after each module
+* Code must be:
+
+  * Clean and well-structured
+  * Properly commented
+  * Testable independently
+* Avoid unnecessary abstractions
+* Follow the given folder structure strictly
+
+---
+
+## 📁 PROJECT STRUCTURE
+
+We will follow this structure:
+
+* preprocessing/
+* models/
+* generation/
+* evaluation/
+* app/
+* pipeline.py
+
+---
+
+## 🧠 IMPLEMENTATION STRATEGY
+
+We will implement modules in THIS ORDER:
+
+1. Text Extraction Module
+2. Preprocessing Module
+3. Sentence Ranking Module
+4. Answer Extraction Module
+5. Question Generation Model (T5 fine-tuning)
+6. Difficulty Estimation Module
+7. Distractor Generator
+8. Evaluation Module
+9. Pipeline Integration
+
+---
+
+## 🧩 CURRENT TASK
+
+Start with:
+
+### MODULE 1 — Text Extraction
+
+Requirements:
+
+* Support:
+
+  * PDF (PyMuPDF)
+  * PPTX (python-pptx)
+  * TXT
+* Return clean text string
+* Handle encoding issues
+* Include:
+
+  * Error handling
+  * Test function
+
+---
+
+## 📌 OUTPUT FORMAT
+
+For each module, provide:
+
+1. File name
+2. Full code
+3. Explanation of key parts
+4. Example usage
+5. Test case
+
+---
+
+## 🚫 DO NOT
+
+* Do NOT use external APIs
+* Do NOT skip explanations
+* Do NOT combine multiple modules
+* Do NOT assume missing dependencies
+
+---
+
+After completing the module, STOP and wait for my next instruction.
+
+---
+
+Your goal is to help me build a **clean, modular, interview-level AI system step-by-step**.
