@@ -29,8 +29,7 @@ Raw Text → Extract → Preprocess → Rank → Extract Answers → Generate Qu
 
 ```bash
 # Clone repository
-git clone <repo_url>
-cd DL
+git clone https://github.com/Pratham9157/Intelliquizzer-Context-Aware-Question-Answering-Generator.git
 
 # Create virtual environment (recommended)
 python -m venv .venv
@@ -92,7 +91,7 @@ for sentence, answers in results.items():
 │   ├── IMPROVEMENTS_MODULE3.md
 │   ├── IMPROVEMENTS_MODULE4.md
 │   ├── MODULE4_EXPLANATION.md
-│   └── README_OLD.md
+│   └── README_v1.md
 │
 ├── LLM_prompts/               # Reference prompts for agents
 ├── requirements.txt           # Python dependencies
@@ -304,11 +303,12 @@ ranked = rank_sentences(sentences, top_k=5)
 
 ## 📝 License
 
-[Add your license here]
+MIT
 
 ## 👤 Author
 
-[Add author information]
+-Pratham Rathod
+-Sanjana Meena
 
 ## 🤝 Contributing
 
