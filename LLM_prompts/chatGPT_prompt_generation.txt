@@ -10,4 +10,16 @@
 4)module 1 was implemented and tested... check it and if it looks nice then lets write the prompt for module 2
 
 
-5)
+5)okay, now that you have reviewed the code done for module2, lets design a prompt for module 3
+
+
+6)this was made for the module 3... what do you think? does it live up to the need of the project and is everything implemented properly?
+
+
+7)yeah, lets go to next module... module-4 and design its prompt to carefully guide the coding agent
+
+
+8)this was the work done for module 4... how does it look to you?
+
+
+9)

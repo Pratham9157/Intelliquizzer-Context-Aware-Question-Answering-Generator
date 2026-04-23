@@ -1,0 +1,404 @@
+Prompt 1:
+""" You are a senior ML engineer reviewing and improving an existing NLP module.
+
+I have already implemented a Sentence Ranking module using:
+
+* TF-IDF vectorization
+* Centroid-based scoring
+* Cosine similarity
+* NER-based boosting
+* Deduplication
+
+Your task is to APPLY TARGETED IMPROVEMENTS to the existing code WITHOUT rewriting it completely.
+
+---
+
+## ⚠️ IMPORTANT RULES
+
+* Do NOT rewrite the entire file
+* Only modify relevant parts
+* Preserve existing structure and functions
+* Keep code clean and readable
+* Add comments explaining each improvement
+* Ensure backward compatibility
+
+---
+
+## 🎯 REQUIRED IMPROVEMENTS
+
+---
+
+### 1. Improve NER Boost Stability
+
+Current:
+
+```python
+boost = 0.05 * num_entities
+```
+
+Problem:
+
+* Too many entities → overly large boost
+
+Fix:
+
+* Cap entity contribution:
+
+```python
+boost = 0.05 * min(num_entities, 3)
+```
+
+---
+
+### 2. Move Deduplication AFTER Ranking
+
+Current issue:
+
+* Deduplication happens before scoring, which may distort importance
+
+Required change:
+
+* Perform full ranking FIRST
+* Then remove similar sentences only from top-ranked results
+
+Update:
+
+* Modify `rank_sentences()` pipeline accordingly
+* Ensure top_k results are diverse after filtering
+
+---
+
+### 3. Improve TF-IDF Representation
+
+Current:
+
+```python
+TfidfVectorizer(max_features=500)
+```
+
+Fix:
+
+* Increase to:
+
+```python
+max_features=1000
+```
+
+OR remove the limit entirely if feasible
+
+---
+
+### 4. Add Position-Based Importance Boost
+
+Rationale:
+
+* Earlier sentences in a document often contain key information
+
+Add:
+
+```python
+position_boost = 0.02 * (1 - index / len(sentences))
+```
+
+* Apply this boost to final score
+* Ensure it does NOT dominate TF-IDF score
+
+---
+
+### 5. Normalize Final Scores
+
+Problem:
+
+* NER boost may push score > 1
+
+Fix:
+
+* Clip scores:
+
+```python
+final_score = min(score, 1.0)
+```
+
+---
+
+### 6. Ensure Deduplication Uses Top-K Filtering
+
+Update logic:
+
+* After sorting:
+
+  * Iterate over ranked sentences
+  * Add to result only if not too similar to already selected ones
+
+Reuse:
+
+* cosine similarity logic from existing function
+
+---
+
+## 🧪 TEST UPDATE
+
+Update test cases to verify:
+
+* NER cap works
+* Deduplication still effective
+* Position boost influences ranking
+* Scores remain within [0, 1]
+
+---
+
+## 📌 OUTPUT FORMAT
+
+Provide:
+
+1. Updated code snippets (ONLY modified parts)
+2. Clear explanation of each change
+3. Example demonstrating improved ranking
+4. Any new helper functions added
+
+---
+
+## 🚫 DO NOT
+
+* Do NOT rewrite entire module
+* Do NOT remove existing features
+* Do NOT introduce external APIs
+* Do NOT overcomplicate logic
+
+---
+
+Your goal is to upgrade the module from a strong implementation to a **robust, interview-level intelligent ranking system**.
+
+"""
+
+
+prompt 2 - for module 4
+
+"""
+You are a senior NLP engineer improving an existing Answer Extraction module.
+
+The module already implements:
+
+* Named Entity Recognition (NER)
+* Noun phrase extraction
+* Rule-based filtering
+* Answer type classification
+* Answer scoring
+
+Your task is to apply TARGETED IMPROVEMENTS to enhance efficiency, quality, and correctness.
+
+---
+
+## ⚠️ IMPORTANT RULES
+
+* Do NOT rewrite the entire file
+* Only modify relevant functions
+* Preserve current structure and APIs
+* Add clear comments explaining each improvement
+* Maintain backward compatibility
+
+---
+
+# 🎯 REQUIRED IMPROVEMENTS
+
+---
+
+## 1. 🚀 Optimize NER Computation (CRITICAL FIX)
+
+### Problem:
+
+NER is recomputed inside `score_answer()` for every answer.
+
+### Fix:
+
+* Compute NER ONCE per sentence
+* Pass entities to `score_answer()`
+
+### Required Changes:
+
+Update function signature:
+
+```python
+score_answer(answer: str, sentence: str, entities: List[Tuple[str, str]], ...)
+```
+
+Inside `extract_answers()`:
+
+* Extract entities once
+* Pass them into scoring
+
+---
+
+## 2. 📊 Implement TRUE Frequency-Based Scoring
+
+### Problem:
+
+Frequency parameter is always `1`
+
+### Fix:
+
+* Compute frequency of answers across ALL sentences
+
+### Required Steps:
+
+1. Before scoring:
+
+```python
+from collections import Counter
+all_candidates = [...]
+frequency_map = Counter(all_candidates)
+```
+
+2. Pass frequency:
+
+```python
+frequency = frequency_map[answer]
+```
+
+3. Use it in scoring
+
+---
+
+## 3. 🧹 Remove Overlapping / Redundant Answers
+
+### Problem:
+
+Short answers may duplicate longer ones
+
+Example:
+
+* "Einstein"
+* "Albert Einstein"
+
+### Fix:
+
+* Keep longer, more informative span
+
+### Required:
+
+Add function:
+
+```python
+remove_overlapping_answers(answers: List[str]) -> List[str]
+```
+
+Logic:
+
+* If one answer is substring of another → remove shorter
+
+Apply AFTER filtering
+
+---
+
+## 4. ⭐ Prioritize NER Answers
+
+### Problem:
+
+NER and noun phrases treated equally
+
+### Fix:
+
+* Give NER answers slight advantage
+
+### Implementation:
+
+In scoring:
+
+```python
+if source == "NER":
+    score += 0.1
+```
+
+Ensure score is still normalized
+
+---
+
+## 5. 📍 Add Answer Position Inside Sentence
+
+### Problem:
+
+Only sentence position used
+
+### Fix:
+
+* Earlier answers in sentence are more important
+
+### Implementation:
+
+```python
+position_in_sentence = sentence.find(answer)
+position_score = 1 - (position_in_sentence / len(sentence))
+```
+
+Incorporate into scoring
+
+---
+
+## 6. 🎯 Add Minimum Score Threshold
+
+### Problem:
+
+Low-quality answers still included
+
+### Fix:
+
+* Filter answers after scoring
+
+### Implementation:
+
+```python
+MIN_SCORE_THRESHOLD = 0.3
+
+if answer_score < MIN_SCORE_THRESHOLD:
+    discard
+```
+
+Apply before selecting top-K
+
+---
+
+## 7. ⚡ Minor Efficiency Improvements
+
+* Avoid repeated spaCy calls
+* Reuse parsed doc where possible
+* Avoid redundant string operations
+
+---
+
+# 🧪 TEST UPDATES
+
+Update test cases to verify:
+
+* NER is not recomputed repeatedly
+* Frequency scoring affects ranking
+* Overlapping answers removed correctly
+* NER answers ranked higher
+* Low-score answers filtered out
+
+---
+
+# 📌 OUTPUT FORMAT
+
+Provide:
+
+1. Updated code snippets (ONLY modified parts)
+2. Explanation of each improvement
+3. Example showing improved extraction quality
+4. Any new helper functions
+
+---
+
+## 🚫 DO NOT
+
+* Do NOT rewrite entire module
+* Do NOT remove existing functionality
+* Do NOT introduce external APIs
+* Do NOT overcomplicate logic
+
+---
+
+## 🎯 GOAL
+
+Upgrade this module into a:
+**high-quality, efficient, and intelligent answer extraction system suitable for real-world NLP pipelines and interviews.**
+"""

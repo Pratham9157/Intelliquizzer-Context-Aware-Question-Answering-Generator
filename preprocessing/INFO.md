@@ -497,6 +497,42 @@ The **Text Preprocessing Module** converts raw extracted text into clean, normal
 
 ---
 
+### ✨ Recent Improvements (Version 1.1)
+
+The following 6 enhancements were made to Module 2 for better text quality:
+
+1. **Unicode Combining Character Removal** - Enhanced `normalize_unicode()` to remove diacritical marks (accents, umlauts) after NFKD normalization
+   - Removes combining characters with `unicodedata.combining()`
+   - Converts "café" → "cafe", "Zürich" → "Zurich"
+   - Better ASCII compatibility for downstream modules
+
+2. **Reduced Minimum Sentence Length** - Changed `MIN_SENTENCE_LENGTH` from 6 to 4 words
+   - Preserves short factual sentences like "Paris is capital"
+   - Improves coverage on concise academic content
+   - 4 words is still sufficient to avoid single-word noise
+
+3. **Email Address Removal** - Added regex pattern to `clean_text()` to strip email addresses
+   - Pattern: `\S+@\S+` (e.g., "john@example.com")
+   - Removes academic author contact information
+   - Reduces noise in citation metadata
+
+4. **URL and Web Link Removal** - Added regex patterns to `clean_text()` to remove URLs
+   - Patterns: `http\S+` and `www\S+`
+   - Removes hyperlinks and web references
+   - Improves sentence coherence by removing broken links
+
+5. **Duplicate Sentence Removal** - Added deduplication step in `preprocess()` after filtering
+   - Uses `list(dict.fromkeys(sentences))` to preserve order
+   - Prevents repeated questions from identical sentence pairs
+   - Essential for Module 3 (Sentence Ranking) effectiveness
+
+6. **ALL_CAPS Header Filtering** - Enhanced `is_noisy_sentence()` to detect and filter headers
+   - Checks if sentence length ≥ 10 and `sentence.isupper()`
+   - Filters out document headers like "CHAPTER 1", "SECTION A"
+   - Reduces non-content noise from document structure
+
+---
+
 ### ⚙️ Configuration & Modes
 
 #### 1. **Logging Levels**
@@ -680,7 +716,7 @@ Main preprocessing pipeline.
 ```python
 preprocess(
     text: str,
-    min_sentence_length: int = 6,
+    min_sentence_length: int = 4,
     min_alpha_ratio: float = 0.5,
     max_digit_ratio: float = 0.3,
     max_special_ratio: float = 0.2,
@@ -690,7 +726,7 @@ preprocess(
 
 **Parameters:**
 - `text` (str): Raw extracted text
-- `min_sentence_length` (int): Minimum words per sentence (default: 6)
+- `min_sentence_length` (int): Minimum words per sentence (default: 4)
 - `min_alpha_ratio` (float): Min alphabetic chars ratio 0-1 (default: 0.5)
 - `max_digit_ratio` (float): Max digit chars ratio 0-1 (default: 0.3)
 - `max_special_ratio` (float): Max special chars ratio 0-1 (default: 0.2)
@@ -874,7 +910,7 @@ Configurable constants in `preprocessor.py`:
 
 ```python
 # Filtering thresholds
-MIN_SENTENCE_LENGTH = 6           # Minimum words per sentence
+MIN_SENTENCE_LENGTH = 4           # Minimum words per sentence (reduced from 6 to keep short factuals)
 MIN_ALPHABETIC_RATIO = 0.5        # Minimum ratio of alphabetic chars (0-1)
 MAX_DIGIT_RATIO = 0.3             # Maximum ratio of digits (0-1)
 MAX_SPECIAL_CHAR_RATIO = 0.2      # Maximum ratio of special chars (0-1)

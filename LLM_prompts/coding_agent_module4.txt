@@ -1,0 +1,236 @@
+You are a senior NLP engineer building a modular AI system.
+
+We are developing:
+“Context-Aware Automatic Question Generation using Transformer-based Sequence Modeling”
+
+Modules 1–3 are already implemented:
+
+* Text Extraction
+* Preprocessing
+* Sentence Ranking
+
+Now implement:
+
+---
+
+# 🧩 MODULE 4 — ANSWER EXTRACTION MODULE
+
+## 🎯 OBJECTIVE
+
+Extract meaningful answer spans from sentences to be used as targets for question generation.
+
+The system should identify:
+
+* Named entities (who, where, organization)
+* Important noun phrases
+* Key factual spans
+
+---
+
+## ⚠️ IMPLEMENTATION RULES
+
+* Build a hybrid system (NOT just one method)
+* Use spaCy for NER and noun chunks
+* Implement rule-based logic yourself
+* Keep code modular and explainable
+* Avoid black-box APIs
+* Each extracted answer must be meaningful and non-trivial
+
+---
+
+## 📁 FILE LOCATION
+
+Create:
+
+generation/answer_extractor.py
+
+---
+
+## 🧠 FUNCTIONAL REQUIREMENTS
+
+---
+
+### 1. Named Entity Extraction
+
+Implement:
+
+```python
+extract_named_entities(sentence: str) -> List[Tuple[str, str]]
+```
+
+* Use spaCy
+* Return:
+
+  * (entity_text, entity_label)
+
+Example:
+[("Barack Obama", "PERSON"), ("Paris", "GPE")]
+
+---
+
+### 2. Noun Phrase Extraction
+
+Implement:
+
+```python
+extract_noun_phrases(sentence: str) -> List[str]
+```
+
+* Use spaCy noun_chunks
+* Filter:
+
+  * Remove very short phrases (< 2 words)
+  * Remove stopword-only phrases
+
+---
+
+### 3. Rule-Based Answer Filtering
+
+Implement:
+
+```python
+filter_answers(candidates: List[str]) -> List[str]
+```
+
+Rules:
+
+* Remove duplicates
+* Remove:
+
+  * very short answers (< 3 characters)
+  * purely numeric values (unless meaningful like years)
+  * generic words (e.g., "thing", "something")
+* Normalize text
+
+---
+
+### 4. Answer Type Classification
+
+Implement:
+
+```python
+classify_answer_type(answer: str) -> str
+```
+
+Return:
+
+* "PERSON"
+* "LOCATION"
+* "ORGANIZATION"
+* "DATE"
+* "CONCEPT"
+* "OTHER"
+
+Use:
+
+* NER labels if available
+* Otherwise simple heuristics
+
+---
+
+### 5. Main Extraction Function
+
+```python
+extract_answers(sentences: List[str], max_answers_per_sentence=3) -> Dict
+```
+
+Pipeline:
+
+For each sentence:
+
+1. Extract NER entities
+2. Extract noun phrases
+3. Combine candidates
+4. Filter answers
+5. Limit to top N answers
+6. Attach type
+
+Return:
+
+```python
+{
+  sentence: [
+    {"answer": "...", "type": "..."},
+    ...
+  ]
+}
+```
+
+---
+
+### 6. Ranking Answer Importance (IMPORTANT FEATURE)
+
+Implement:
+
+```python
+score_answer(answer: str, sentence: str) -> float
+```
+
+Heuristics:
+
+* Length of answer
+* NER presence
+* Position in sentence
+* Frequency
+
+Use this to:
+
+* Select best answers per sentence
+
+---
+
+## 🧪 TESTING REQUIREMENTS
+
+Implement:
+
+```python
+test_answer_extractor()
+```
+
+Test:
+
+* Named entities
+* Noun phrases
+* Mixed sentences
+* Edge cases
+
+Print:
+
+* Sentence
+* Extracted answers
+* Types
+
+---
+
+## 📌 OUTPUT FORMAT
+
+Provide:
+
+1. File name
+2. Full code
+3. Explanation of:
+
+   * Extraction logic
+   * Filtering strategy
+   * Answer typing
+4. Example usage
+5. Test output
+
+---
+
+## 🚫 DO NOT
+
+* Do NOT use full QA models (like BERT QA)
+* Do NOT skip filtering
+* Do NOT extract trivial words
+* Do NOT merge modules
+
+---
+
+## 🎯 GOAL
+
+Build a **clean, explainable, and intelligent answer extraction system** that improves the quality of generated questions significantly.
+
+---
+
+After completing this module, STOP and wait for further instructions.

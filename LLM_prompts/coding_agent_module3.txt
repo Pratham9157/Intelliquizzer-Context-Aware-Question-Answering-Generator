@@ -1,0 +1,195 @@
+You are a senior ML engineer specializing in NLP systems.
+
+We are building a modular AI system for:
+“Context-Aware Automatic Question Generation using Transformer-based Sequence Modeling”
+
+Modules 1 and 2 (Text Extraction + Preprocessing) are already completed.
+
+Now implement:
+
+---
+
+# 🧩 MODULE 3 — SENTENCE RANKING / IMPORTANCE MODULE
+
+## 🎯 OBJECTIVE
+
+Rank sentences based on their importance within a document, so that only the most informative sentences are used for question generation.
+
+---
+
+## ⚠️ IMPLEMENTATION RULES
+
+* Write clean, modular, testable code
+* Do NOT use black-box ranking libraries
+* Use TF-IDF + cosine similarity as core logic
+* You MAY use sklearn only for TF-IDF vectorization
+* Implement ranking logic manually
+* Code must be explainable in interviews
+
+---
+
+## 📁 FILE LOCATION
+
+Create:
+
+preprocessing/sentence_ranker.py
+
+---
+
+## 🧠 FUNCTIONAL REQUIREMENTS
+
+---
+
+### 1. TF-IDF Vectorization
+
+Use:
+
+```python
+TfidfVectorizer(stop_words='english')
+```
+
+* Input: list of sentences
+* Output: TF-IDF matrix (N × vocab)
+
+---
+
+### 2. Document Centroid Calculation
+
+Implement:
+
+```python
+compute_centroid(tfidf_matrix) -> np.ndarray
+```
+
+Logic:
+
+* Mean of all sentence vectors
+
+---
+
+### 3. Sentence Scoring
+
+Implement:
+
+```python
+score_sentences(tfidf_matrix, centroid) -> List[float]
+```
+
+Use:
+
+* Cosine similarity between each sentence vector and centroid
+
+---
+
+### 4. Named Entity Boost (IMPORTANT FEATURE)
+
+Use spaCy (`en_core_web_sm`)
+
+Implement:
+
+```python
+ner_boost(sentence: str, base_score: float) -> float
+```
+
+Logic:
+
+* Count number of named entities
+* Add small boost:
+
+```python
+boost = 0.05 * num_entities
+```
+
+---
+
+### 5. Final Ranking Function
+
+Implement:
+
+```python
+rank_sentences(sentences: List[str], top_k: int = 10) -> List[Tuple[str, float]]
+```
+
+Pipeline:
+
+1. TF-IDF transform
+2. Compute centroid
+3. Compute cosine similarity scores
+4. Apply NER boost
+5. Sort by score (descending)
+6. Return top_k sentences (preserve original order optionally)
+
+---
+
+### 6. Duplicate / Similar Sentence Handling (IMPORTANT)
+
+Add logic to avoid redundancy:
+
+* If two sentences are very similar:
+
+  * Keep only one
+
+Implement:
+
+```python
+remove_similar_sentences(sentences, threshold=0.9)
+```
+
+Use cosine similarity between sentence vectors.
+
+---
+
+### 7. Optional Enhancement (IF EASY)
+
+Add:
+
+* Length normalization (avoid bias toward long sentences)
+
+---
+
+## 🧪 TESTING REQUIREMENTS
+
+Provide:
+
+### test_sentence_ranker()
+
+Test cases:
+
+* Normal paragraph
+* Repeated sentences
+* Sentences with named entities
+* Mixed importance sentences
+
+Print:
+
+* Ranked sentences
+* Scores
+
+---
+
+## 📌 OUTPUT FORMAT
+
+For this module, provide:
+
+1. File name
+2. Full code
+3. Explanation of:
+
+   * TF-IDF logic
+   * Cosine similarity
+   * NER boosting
+4. Example usage
+5. Test output
+
+---
+
+## 🚫 DO NOT
+
+* Do NOT use summarization APIs
+* Do NOT skip centroid logic
+* Do NOT combine with other modules
+* Do NOT overcomplicate
+
+---
+
+After completing this module, STOP and wait for further instructions.

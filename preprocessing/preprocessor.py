@@ -23,19 +23,15 @@ import unicodedata
 from typing import List, Dict, Tuple
 import logging
 
-# Auto-setup dependencies on first import
-try:
-    from setup import ensure_dependencies
-    ensure_dependencies()
-except ImportError:
-    pass  # setup.py not available, assume manual setup
+# Note: All dependencies should be installed via: pip install -r requirements.txt
+# No runtime auto-setup - users handle dependencies before use
 
 # ============================================================================
 # CONFIGURATION CONSTANTS
 # ============================================================================
 
 # Filtering thresholds
-MIN_SENTENCE_LENGTH = 6  # Minimum words per sentence
+MIN_SENTENCE_LENGTH = 4  # Minimum words per sentence (reduced from 6 to keep short factuals)
 MIN_ALPHABETIC_RATIO = 0.5  # Minimum ratio of alphabetic chars
 MAX_DIGIT_RATIO = 0.3  # Maximum ratio of digits allowed
 MAX_SPECIAL_CHAR_RATIO = 0.2  # Maximum ratio of special chars
@@ -60,22 +56,29 @@ logger = logging.getLogger(__name__)
 
 def normalize_unicode(text: str) -> str:
     """
-    Normalize unicode text to NFKD form.
+    Normalize unicode text to NFKD form and remove combining characters.
     
     NFKD normalization decomposes characters into base + combining marks.
+    Then removes combining marks (accents, diacritics) for clean ASCII output.
     Useful for handling accented characters and special unicode variants.
     
     Args:
         text: Input text with potential unicode variations
         
     Returns:
-        Normalized text in NFKD form
+        Normalized text with accents removed
         
     Example:
         >>> normalize_unicode("café")
-        'cafe'  # With combining accent mark removed in subsequent processing
+        'cafe'  # Accent removed
+        >>> normalize_unicode("Zürich")
+        'Zurich'  # Umlaut removed
     """
-    return unicodedata.normalize("NFKD", text)
+    # Step 1: NFKD normalization (decompose accented chars)
+    text = unicodedata.normalize("NFKD", text)
+    # Step 2: Remove combining characters (accents, diacritics)
+    text = ''.join(c for c in text if not unicodedata.combining(c))
+    return text
 
 
 def is_noisy_sentence(sentence: str,
@@ -91,6 +94,7 @@ def is_noisy_sentence(sentence: str,
     2. Too few alphabetic characters (< min_alpha_ratio)
     3. Too many digits (> max_digit_ratio)
     4. Too many special characters (> max_special_ratio)
+    5. ALL CAPS (likely headers or labels)
     
     Args:
         sentence: Sentence to evaluate
@@ -109,34 +113,41 @@ def is_noisy_sentence(sentence: str,
         (False, "")
         
         >>> is_noisy_sentence("A")
-        (True, "Too short (1 words < 6)")
+        (True, "Too short (1 words < 4)")
         
         >>> is_noisy_sentence("123 456 789 000 111")
         (True, "Too many digits (ratio: 0.77 > 0.30)")
     """
     sentence = sentence.strip()
     
-    # Check 1: Sentence length (in words)
+    # Check 0: Empty sentence
+    if len(sentence) == 0:
+        return True, "Empty sentence"
+    
+    # Check 1: ALL CAPS (likely headers)
+    # if len(sentence) >= 10 and sentence.isupper():
+    upper_ratio = sum(1 for c in sentence if c.isupper()) / max(len(sentence), 1)
+    if upper_ratio > 0.8:
+        return True, f"ALL CAPS header (likely label)"
+    
+    # Check 2: Sentence length (in words)
     word_count = len(sentence.split())
     if word_count < min_length:
         return True, f"Too short ({word_count} words < {min_length})"
     
-    # Check 2: Alphabetic ratio
-    if len(sentence) == 0:
-        return True, "Empty sentence"
-    
+    # Check 3: Alphabetic ratio
     alpha_chars = sum(1 for c in sentence if c.isalpha())
     alpha_ratio = alpha_chars / len(sentence)
     if alpha_ratio < min_alpha_ratio:
         return True, f"Too few alphabetic chars (ratio: {alpha_ratio:.2f} < {min_alpha_ratio})"
     
-    # Check 3: Digit ratio
+    # Check 4: Digit ratio
     digit_chars = sum(1 for c in sentence if c.isdigit())
     digit_ratio = digit_chars / len(sentence)
     if digit_ratio > max_digit_ratio:
         return True, f"Too many digits (ratio: {digit_ratio:.2f} > {max_digit_ratio})"
     
-    # Check 4: Special character ratio
+    # Check 5: Special character ratio
     special_chars = sum(1 for c in sentence if not (c.isalnum() or c.isspace() or c in '.,!?;:-'))
     special_ratio = special_chars / len(sentence)
     if special_ratio > max_special_ratio:
@@ -154,11 +165,12 @@ def clean_text(text: str) -> str:
     Clean raw extracted text for further processing.
     
     Operations performed:
-    1. Unicode normalization (NFKD)
-    2. Remove bracketed/parenthesized text ([1], (note), {ref})
-    3. Remove control characters
-    4. Normalize whitespace (multiple spaces → single)
-    5. Normalize line endings
+    1. Unicode normalization (NFKD with accent removal)
+    2. Remove emails and URLs
+    3. Remove bracketed/parenthesized text ([1], (note), {ref})
+    4. Remove control characters
+    5. Normalize whitespace (multiple spaces → single)
+    6. Normalize line endings
     
     Args:
         text: Raw extracted text
@@ -172,24 +184,28 @@ def clean_text(text: str) -> str:
     """
     logger.debug(f"Cleaning text ({len(text)} chars)")
     
-    # Step 1: Unicode normalization
+    # Step 1: Unicode normalization (removes accents)
     text = normalize_unicode(text)
     
     # Step 2: Remove control characters (except newlines)
     text = re.sub(r'[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]', '', text)
     
-    # Step 3: Remove bracketed/parenthesized content
+    # Step 3: Remove emails and URLs (noise in academic text)
+    text = re.sub(r'\S+@\S+', '', text)  # Remove email@example.com
+    text = re.sub(r'https?://\S+|www\.\S+', '', text)  # Remove URLs
+    
+    # Step 4: Remove bracketed/parenthesized content
     # Patterns: [1], (note), {ref}, etc.
     text = re.sub(r'\[\d+\]', '', text)  # [1], [2], etc. (citations)
     text = re.sub(r'\([^)]*\)', '', text)  # (...)
     text = re.sub(r'\{[^}]*\}', '', text)  # {...}
     text = re.sub(r'\[[^\]]*\]', '', text)  # [...]
     
-    # Step 4: Normalize line breaks
+    # Step 5: Normalize line breaks
     text = re.sub(r'\r\n', '\n', text)  # Windows → Unix
     text = re.sub(r'\r', '\n', text)    # Old Mac → Unix
     
-    # Step 5: Normalize spaces
+    # Step 6: Normalize spaces
     # Preserve paragraph breaks (double newlines)
     paragraphs = text.split('\n\n')
     normalized_paragraphs = [
@@ -375,8 +391,14 @@ def preprocess(text: str,
         max_special_ratio=max_special_ratio
     )
     
-    logger.info(f"Preprocessing complete: {len(filtered_sentences)} final sentences")
-    return filtered_sentences
+    # Step 4: Remove duplicate sentences (preserve order)
+    # Using dict.fromkeys() to remove duplicates while keeping order (Python 3.7+)
+    deduplicated_sentences = list(dict.fromkeys(filtered_sentences))
+    if len(deduplicated_sentences) < len(filtered_sentences):
+        logger.debug(f"Removed {len(filtered_sentences) - len(deduplicated_sentences)} duplicate sentences")
+    
+    logger.info(f"Preprocessing complete: {len(deduplicated_sentences)} final sentences")
+    return deduplicated_sentences
 
 
 def get_preprocessing_stats(sentences: List[str]) -> Dict:
@@ -523,7 +545,7 @@ def test_preprocessor():
     # Only short sentences (should be filtered)
     try:
         result = preprocess("A. B. C. D.", log_level=logging.WARNING)
-        print(f"[OK] Short sentences handled: {len(result)} sentences kept (all filtered as < 6 words)")
+        print(f"[OK] Short sentences handled: {len(result)} sentences kept (all filtered as < 4 words)")
     except Exception as e:
         print(f"[ERROR] {e}")
     
