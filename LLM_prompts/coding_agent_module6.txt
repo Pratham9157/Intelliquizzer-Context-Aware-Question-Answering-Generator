@@ -1,0 +1,327 @@
+You are a senior NLP engineer extending an existing Question Generation system.
+
+The system already has:
+
+* Answer extraction (with answer type)
+* Question generation (fine-tuned T5)
+* Scoring and validation
+* End-to-end pipeline
+
+Now implement:
+
+---
+
+# 🧩 MODULE 6 — MCQ DISTRACTOR GENERATION + OUTPUT FORMATTER
+
+---
+
+## 🎯 OBJECTIVE
+
+Convert generated (question, answer) pairs into:
+
+👉 High-quality MCQs with:
+
+* 1 correct answer
+* 3 plausible distractors (wrong options)
+
+---
+
+# ⚠️ IMPORTANT RULES
+
+* Do NOT modify previous modules
+* Integrate cleanly with existing pipeline output
+* Keep logic modular and reusable
+* Avoid external APIs
+* Focus on **smart distractor generation**
+
+---
+
+# 📁 FILES TO CREATE
+
+Create:
+
+```text
+generation/distractor_generator.py
+generation/output_formatter.py
+```
+
+---
+
+# 🧠 PART 1 — DISTRACTOR GENERATION
+
+---
+
+## 🔹 Function 1: WordNet-Based Distractors
+
+```python
+get_wordnet_distractors(answer: str, answer_type: str, n=3) -> List[str]
+```
+
+---
+
+### Logic:
+
+* Use `nltk.corpus.wordnet`
+* Get:
+
+  * synonyms
+  * hypernyms → hyponyms
+* Extract candidates
+
+---
+
+### Rules:
+
+* Exclude:
+
+  * exact answer
+  * duplicates
+* Clean:
+
+  * replace "_" with space
+* Return top `n`
+
+---
+
+---
+
+## 🔹 Function 2: Context-Based Distractors (IMPORTANT)
+
+```python
+get_context_distractors(answer: str, context: str, answer_type: str) -> List[str]
+```
+
+---
+
+### Logic:
+
+* Use spaCy:
+
+  * extract entities from context
+* Select entities:
+
+  * SAME TYPE as answer
+* Remove:
+
+  * correct answer
+
+---
+
+### Example:
+
+Context:
+"Einstein and Newton contributed to physics."
+
+Answer: Einstein
+
+Distractors:
+Newton, Tesla, Galileo
+
+---
+
+---
+
+## 🔹 Function 3: Hybrid Distractor Generator (MAIN FUNCTION)
+
+```python
+generate_distractors(answer: str, context: str, answer_type: str) -> List[str]
+```
+
+---
+
+### Strategy:
+
+1. Get:
+
+   * context distractors
+   * wordnet distractors
+
+2. Merge them
+
+3. Remove duplicates
+
+4. Ensure:
+
+   * exactly 3 distractors
+   * if not enough → add fallback:
+
+     ```python
+     ["Option A", "Option B", "Option C"]
+     ```
+
+---
+
+---
+
+# 🧠 PART 2 — MCQ BUILDER
+
+---
+
+## 🔹 Function:
+
+```python
+build_mcq(question: str, answer: str, distractors: List[str]) -> Dict
+```
+
+---
+
+### Output format:
+
+```python
+{
+  "question": "...",
+  "options": {
+    "A": "...",
+    "B": "...",
+    "C": "...",
+    "D": "..."
+  },
+  "answer": "B"
+}
+```
+
+---
+
+### Logic:
+
+* Combine:
+
+  * 3 distractors + 1 correct answer
+* Shuffle options
+* Determine correct option key
+
+---
+
+---
+
+# 🧠 PART 3 — OUTPUT FORMATTER
+
+---
+
+## 🔹 Function:
+
+```python
+format_output(items: List[Dict]) -> Dict
+```
+
+---
+
+### Input:
+
+```python
+[
+  {
+    "question": "...",
+    "answer": "...",
+    "type": "...",
+    "context": "..."
+  }
+]
+```
+
+---
+
+### Output:
+
+```python
+{
+  "MCQ": [...],
+  "ShortAnswer": [...],
+  "FAQ": [...]
+}
+```
+
+---
+
+### Rules:
+
+* Always include:
+
+  * MCQ
+  * ShortAnswer (Q + A)
+* FAQ:
+
+  * include if question starts with "What" / "Why"
+
+---
+
+---
+
+# 🧪 TESTING (IMPORTANT)
+
+Create:
+
+```python
+test_module7()
+```
+
+Test:
+
+* PERSON answers
+* LOCATION answers
+* DATE answers
+* NOUN phrases
+
+---
+
+Print:
+
+* Question
+* Options
+* Correct answer
+
+---
+
+---
+
+# ⚠️ EDGE CASES
+
+Handle:
+
+* No distractors found
+* Repeated options
+* Very short answers
+* Numeric answers
+
+---
+
+---
+
+# 📌 OUTPUT FORMAT
+
+Provide:
+
+1. File names
+2. Full code
+3. Explanation:
+
+   * distractor logic
+   * hybrid approach
+4. Example outputs
+
+---
+
+---
+
+# 🚫 DO NOT
+
+* Do NOT use APIs
+* Do NOT hardcode answers
+* Do NOT break existing pipeline
+* Do NOT generate random meaningless distractors
+
+---
+
+---
+
+# 🎯 GOAL
+
+Build a smart MCQ generation system that:
+
+* Produces meaningful distractors
+* Works across answer types
+* Integrates seamlessly with the existing NLP pipeline
+
+---
+
+After implementation, STOP and wait for further instructions.

@@ -1,0 +1,426 @@
+You are a senior AI systems engineer extending an existing academic NLP project.
+
+# PROJECT
+
+AI-Powered Document Assessment & Intelligent Question Generation System
+
+The current system already includes:
+
+* PDF/TXT extraction
+* preprocessing + cleaning
+* sentence ranking
+* answer extraction
+* question generation (fine-tuned T5)
+* MCQ generation
+* Streamlit dashboard
+
+The next phase is to add:
+
+# 🔥 LOCAL RAG (Retrieval-Augmented Generation)
+
+IMPORTANT:
+This is NOT an internet-connected chatbot.
+
+The RAG system must work ONLY on:
+
+* uploaded documents
+* previously stored processed documents
+* locally indexed educational content
+
+The goal is to allow users to:
+
+1. Ask questions about uploaded documents
+2. Retrieve relevant document chunks
+3. Generate intelligent contextual answers
+4. Support semantic querying over stored content
+
+The system should behave like:
+"an educational document assistant"
+
+---
+
+# IMPORTANT ARCHITECTURE RULES
+
+---
+
+* Do NOT rewrite existing modules
+* Add RAG as a NEW subsystem
+* Keep architecture modular
+* Preserve current QG pipeline
+* RAG should integrate cleanly with Streamlit UI
+
+---
+
+# HIGH-LEVEL GOAL
+
+---
+
+Current system:
+Document → Q/A + MCQ generation
+
+New system:
+Document → Index → Semantic Retrieval → Intelligent Answering
+
+---
+
+# PHASE 1 — DOCUMENT CHUNKING
+
+---
+
+Create:
+rag/document_chunker.py
+
+Implement:
+chunk_document(text)
+
+Requirements:
+
+* split document into semantic chunks
+* chunk size:
+  200–500 words
+* overlap:
+  30–50 words
+* preserve context continuity
+* avoid breaking sentences
+
+Each chunk should store:
+
+* chunk_id
+* document_id
+* chunk_text
+* metadata
+
+---
+
+# PHASE 2 — EMBEDDING GENERATION
+
+---
+
+Create:
+rag/embedder.py
+
+Use:
+sentence-transformers
+
+Recommended model:
+all-MiniLM-L6-v2
+
+Requirements:
+
+* generate embeddings for chunks
+* generate embeddings for queries
+* cache embeddings efficiently
+
+Functions:
+
+* generate_embedding(text)
+* batch_generate_embeddings(chunks)
+
+---
+
+# PHASE 3 — VECTOR DATABASE
+
+---
+
+Create:
+rag/vector_store.py
+
+Use:
+FAISS
+
+Requirements:
+
+* store embeddings
+* persist indexes locally
+* support:
+
+  * add_documents()
+  * search()
+  * save_index()
+  * load_index()
+
+Store:
+
+* embedding vectors
+* chunk metadata
+* original text
+
+---
+
+# PHASE 4 — RETRIEVAL PIPELINE
+
+---
+
+Create:
+rag/retriever.py
+
+Implement:
+retrieve_relevant_chunks(query)
+
+Pipeline:
+
+1. Embed query
+2. Compute similarity
+3. Retrieve top-k chunks
+4. Return ranked relevant contexts
+
+Requirements:
+
+* cosine similarity
+* configurable top-k
+* relevance scoring
+
+---
+
+# PHASE 5 — RAG ANSWERING
+
+---
+
+Create:
+rag/rag_pipeline.py
+
+Implement:
+answer_query(query)
+
+Pipeline:
+
+1. Retrieve relevant chunks
+2. Build contextual prompt
+3. Generate contextual answer
+
+Prompt format:
+
+Context:
+{retrieved_chunks}
+
+Question:
+{user_query}
+
+Answer:
+
+---
+
+# IMPORTANT
+
+---
+
+The system should:
+
+* answer ONLY using retrieved context
+* avoid hallucination
+* explicitly state when answer is unavailable
+
+If confidence is low:
+return:
+"Answer not found in indexed documents."
+
+---
+
+# PHASE 6 — GENERATION MODEL
+
+---
+
+Use existing T5 model if possible.
+
+If T5 is insufficient:
+use:
+google/flan-t5-base
+
+IMPORTANT:
+
+* keep inference local
+* no OpenAI APIs
+* no internet dependency
+
+---
+
+# PHASE 7 — DATABASE INTEGRATION
+
+---
+
+Create:
+database/document_store.py
+
+Use:
+SQLite
+
+Store:
+
+1. documents
+2. chunks
+3. embeddings metadata
+4. generated Q/A
+5. timestamps
+
+Schema:
+documents(
+id,
+title,
+content,
+uploaded_at
+)
+
+chunks(
+chunk_id,
+document_id,
+chunk_text
+)
+
+---
+
+# PHASE 8 — STREAMLIT UI INTEGRATION
+
+---
+
+Extend existing dashboard.
+
+Add:
+
+# 🔍 Ask Questions About Documents
+
+UI requirements:
+
+* query input box
+* retrieval display
+* answer display
+* source chunk display
+* similarity scores
+
+Show:
+
+1. user query
+2. generated answer
+3. retrieved chunks
+4. source references
+
+---
+
+# PHASE 9 — SOURCE ATTRIBUTION
+
+---
+
+VERY IMPORTANT
+
+Display:
+
+* which chunk generated answer
+* which document source used
+
+Example:
+
+Source:
+Document: SMT_Lecture.pdf
+Chunk 4
+
+This increases explainability.
+
+---
+
+# PHASE 10 — FALLBACK HANDLING
+
+---
+
+If retrieval confidence is weak:
+DO NOT hallucinate.
+
+Return:
+
+* "No relevant information found"
+* suggest similar queries
+
+---
+
+# PHASE 11 — PERFORMANCE OPTIMIZATION
+
+---
+
+Requirements:
+
+* cache embeddings
+* lazy loading
+* persistent FAISS indexes
+* avoid recomputation
+
+---
+
+# PHASE 12 — TESTING
+
+---
+
+Create:
+test_rag_pipeline.py
+
+Test:
+
+1. retrieval quality
+2. semantic similarity
+3. answer correctness
+4. missing-answer handling
+5. multi-document retrieval
+
+Example queries:
+
+* "What is BLEU score?"
+* "How does IBM Model 1 work?"
+* "What is phrase-based translation?"
+
+---
+
+# EXPECTED OUTPUT QUALITY
+
+---
+
+GOOD:
+Q:
+"What is the role of BLEU in machine translation?"
+
+A:
+"BLEU is an evaluation metric used to measure machine translation quality by comparing generated translations with reference translations."
+
+BAD:
+"What is BLEU?"
+"BLEU is BLEU."
+
+---
+
+# FINAL GOAL
+
+---
+
+Transform the project into:
+
+# 🔥 AI-Powered Educational Document Assistant
+
+Capabilities:
+
+* document understanding
+* intelligent retrieval
+* contextual question answering
+* assessment generation
+* semantic search
+
+---
+
+# OUTPUT REQUIREMENTS
+
+---
+
+Provide:
+
+1. complete folder structure
+2. modular code
+3. database schema
+4. FAISS integration
+5. Streamlit integration
+6. retrieval pipeline
+7. testing scripts
+8. setup instructions
+
+DO NOT:
+
+* use external paid APIs
+* rewrite existing architecture
+* hardcode answers
+
+Focus on:
+semantic retrieval + contextual answering + educational usefulness.

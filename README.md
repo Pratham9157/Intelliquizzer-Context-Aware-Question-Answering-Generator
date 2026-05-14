@@ -1,321 +1,352 @@
-# Context-Aware Automatic Question Generation (AQG) System
+# 🧠 IntelliQuizzer v4
 
-A production-ready NLP pipeline for automatically generating questions from documents, built with state-of-the-art deep learning techniques.
+**Context-Aware Automatic Question Generation — 100% Local, Zero API Keys**
 
-## 📋 Overview
+---
 
-The AQG system processes raw documents through a sophisticated 4-module pipeline:
+## 📚 Project Overview
 
-```
-Raw Text → Extract → Preprocess → Rank → Extract Answers → Generate Questions
-```
+IntelliQuizzer is an advanced **Automatic Multiple Choice Question (MCQ) Generation System** that transforms documents into high-quality quiz content. Unlike cloud-based solutions, it runs entirely on your machine with zero API dependencies.
 
-### Pipeline Modules
+### Key Features
+- ✅ **100% Local** — No internet required, no API keys, privacy guaranteed
+- 🎯 **Context-Aware** — Extracts meaningful answers and generates relevant questions
+- 🔧 **Multi-Format Support** — PDF, PPTX, TXT files
+- 💾 **Multiple Export Formats** — TXT, CSV, JSON, Anki, GIFT
+- 📊 **Quality Evaluation** — Built-in metrics dashboard
+- 🎮 **Interactive Quiz Mode** — Self-test on generated questions
+- 🤖 **RAG Q&A** — "Ask Anything" tab for document Q&A with web fallback
+- ⚡ **Smart Filtering** — Rejects low-quality questions automatically
 
-| Module | Purpose | Status |
-|--------|---------|--------|
-| **Module 1** | Text Extraction | ✅ Complete |
-| **Module 2** | Text Preprocessing | ✅ Complete + 6 improvements |
-| **Module 3** | Sentence Ranking | ✅ Complete + 5 improvements |
-| **Module 4** | Answer Extraction | ✅ Complete + 7 improvements |
+---
 
-## 🚀 Quick Start
+## ⚙️ Installation & Setup
 
 ### Prerequisites
-- Python 3.13+
-- pip or conda
+- **Python 3.11** (required; NOT 3.12, 3.13, or 3.14 due to `torch` compatibility)
+- Windows, macOS, or Linux
+- ~2 GB disk space for models
 
-### Installation
+### Setup Steps
 
 ```bash
-# Clone repository
-git clone https://github.com/Pratham9157/Intelliquizzer-Context-Aware-Question-Answering-Generator.git
+# 1. Navigate to project directory
+cd intelliquizzer
 
-# Create virtual environment (recommended)
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+# 2. Create virtual environment with Python 3.11
+py -3.11 -m venv venv              # Windows
+python3.11 -m venv venv            # macOS/Linux
 
-# Install dependencies
+# 3. Activate virtual environment
+venv\Scripts\activate              # Windows
+source venv/bin/activate           # macOS/Linux
+
+# 4. Upgrade pip and install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 
-# Download spaCy model
-python -m spacy download en_core_web_sm
+# 5. Download pre-trained models (one-time, ~1.8 GB)
+python download_models.py
+
+# 6. Launch the app
+streamlit run app.py
 ```
 
-### Usage
+The app opens at `http://localhost:8501`
 
-```python
-from preprocessing import TextExtractor, preprocess, rank_sentences
-from generation import extract_answers
+---
 
-# Step 1: Extract text from document
-extractor = TextExtractor()
-raw_text = extractor.extract('document.pdf')
+## 🎨 Application Tabs
 
-# Step 2: Preprocess
-sentences = preprocess(raw_text)
+The Streamlit interface provides 5 main features:
 
-# Step 3: Rank important sentences
-ranked = rank_sentences(sentences, top_k=5)
+| Tab | Purpose |
+|-----|---------|
+| **Generate MCQs** | Upload text/PDF/PPTX and generate questions with automatic quality filtering |
+| **Quiz Mode** | Take interactive self-tests on generated questions |
+| **Ask Anything** | RAG-powered Q&A — query documents with web search fallback |
+| **Export** | Download questions in TXT, CSV, JSON, Anki, or GIFT format |
+| **Evaluate** | View quality metrics dashboard for generated questions |
 
-# Step 4: Extract answers from ranked sentences
-results = extract_answers(ranked, max_answers_per_sentence=3)
+---
 
-# Print results
-for sentence, answers in results.items():
-    print(f"Sentence: {sentence}")
-    for ans in answers:
-        print(f"  - {ans['answer']} ({ans['type']}, score={ans['score']:.2f})")
+## 🤖 Models Used (all local, all free)
+
+| Module | Model | Size | Purpose |
+|--------|-------|------|---------|
+| M4 Answer Extraction | `dslim/bert-base-NER` | ~430 MB | Named entity recognition |
+| M5 Question Generation | `valhalla/t5-base-qg-hl` | ~850 MB | Seq2seq QG with highlight format |
+| M6 Distractor Clustering | `all-MiniLM-L6-v2` | ~80 MB | Semantic similarity for distractors |
+| QA Tab | `deepset/roberta-base-squad2` | ~480 MB | Extractive question answering |
+
+---
+
+## � Pipeline Architecture (7 Modules)
+
+The system processes text through a carefully orchestrated 7-stage pipeline:
+
 ```
+Raw Input
+    ↓
+M1: Text Extraction (PDF/PPTX/TXT) → Raw text
+    ↓
+M2: Preprocessing → Clean sentences
+    ↓
+M3: Sentence Ranking → Important sentences (TF-IDF + density)
+    ↓
+M4: Answer Extraction → Answer candidates (Pattern + NER + Subject)
+    ↓
+M5: Question Generation → Q&A pairs (valhalla/t5-base-qg-hl)
+    ↓
+M6: Distractor Generation → 3 distractors per Q (Cluster-based, semantic similarity)
+    ↓
+M7: MCQ Assembly → Final questions with quality filtering
+    ↓
+Output: High-quality MCQs
+```
+
+### Stage Details
+
+| Module | Name | Key Algorithm | Size |
+|--------|------|---------------|------|
+| **M1** | Text Extractor | PDF/PPTX/TXT parsing | — |
+| **M2** | Preprocessor | Sentence tokenization | — |
+| **M3** | Sentence Ranker | TF-IDF + info density scoring | — |
+| **M4** | Answer Extractor | Pattern matching + BERT NER | 430 MB |
+| **M5** | Question Generator | T5 seq2seq with highlight format | 850 MB |
+| **M6** | Distractor Generator | Semantic clustering + parallelism | 80 MB |
+| **M7** | MCQ Builder | Stem-overlap filtering + quality checks | — |
+
+### Quality Improvements in v4
+
+#### M4 — Answer Extractor (Pattern-First Approach)
+- **Before:** TF-IDF n-grams → fragmented, verb-heavy answers
+- **After:** 
+  - Detects explicit patterns: "such as X, Y", "(AGI)", "known as X"
+  - BERT NER for entity recognition
+  - Subject-of-sentence extraction
+  - Hard verb gate: **no finite verbs allowed in answers**
+
+#### M5 — Question Generation (Multi-Dataset T5)
+- **Before:** `mrm8488/t5-base-finetuned-question-generation-ap` (SQuAD only)
+- **After:** `valhalla/t5-base-qg-hl` trained on **SQuAD + RACE + CoQA**
+  - Uses `<hl>highlight</hl>` tags around answer span
+  - Better generalization across domains
+
+#### M6 — Distractor Generation (Semantic Clustering)
+- **Before:** Fixed semantic bank → same 4 distractors everywhere
+- **After:** 
+  - Cluster-based selection from corpus
+  - Structural parallelism enforcement
+  - Same length bucket, capitalization, digit presence matching
+  - Domain-aware banks: ML, DL, NLP, CV, AI
+
+#### M7 — MCQ Builder (Quality Filter)
+- **Rejects stem-biased questions** (>65% word overlap with answer)
+- **Rejects low-diversity options** (all options too similar)
+- **Rejects trivial questions** (<5 words)
+- **Builds 2× buffer** then filters to target count
+
+---
 
 ## 📁 Project Structure
 
 ```
-.
-├── preprocessing/              # Modules 1-3: Text extraction, preprocessing, ranking
+intelliquizzer/
+│
+├── app.py                          # Main Streamlit UI (5 tabs)
+├── download_models.py              # Pre-download all models script
+├── requirements.txt                # Python dependencies
+├── __init__.py                     # Package initialization
+│
+├── pipeline/                       # MCQ Generation Pipeline
 │   ├── __init__.py
-│   ├── file_extractor.py      # Module 1: Extract text from PDF/PPTX/TXT
-│   ├── preprocessor.py         # Module 2: Clean & tokenize text
-│   └── sentence_ranker.py      # Module 3: Rank sentences by importance
+│   ├── orchestrator.py             # Pipeline coordinator (M1–M7)
+│   ├── text_extractor.py           # M1: Text extraction
+│   ├── preprocessor.py             # M2: Sentence splitting
+│   ├── sentence_ranker.py          # M3: TF-IDF + density ranking
+│   ├── answer_extractor.py         # M4: Pattern + NER
+│   ├── question_generator.py       # M5: T5 seq2seq
+│   ├── distractor_generator.py     # M6: Semantic clustering
+│   └── mcq_builder.py              # M7: Assembly + filtering
 │
-├── generation/                 # Module 4: Answer extraction
-│   ├── __init__.py
-│   └── answer_extractor.py    # Extract meaningful answer spans
+├── rag/                            # Retrieval-Augmented Generation
+│   └── __init__.py                 # DuckDuckGo + RoBERTa Q&A
 │
-├── tests/                      # Integration tests
-│   ├── test_integration_module1-3.py
-│   └── test_integration_module1-4.py
-│
-├── docs/                       # Documentation & guides
-│   ├── AQG_Project_Plan.md
-│   ├── IMPROVEMENTS_MODULE3.md
-│   ├── IMPROVEMENTS_MODULE4.md
-│   ├── MODULE4_EXPLANATION.md
-│   └── README_v1.md
-│
-├── LLM_prompts/               # Reference prompts for agents
-├── requirements.txt           # Python dependencies
-├── .gitignore                 # Git ignore rules
-└── README.md                  # This file
+└── utils/                          # Utilities
+    ├── __init__.py
+    └── exporter.py                 # Export to TXT/CSV/JSON/Anki/GIFT
 ```
-
-## 📦 Core Components
-
-### Module 1: Text Extraction (`preprocessing/file_extractor.py`)
-- Extracts text from PDF, PPTX, and TXT files
-- Robust error handling and encoding detection
-- **Status:** 6/6 tests passing
-
-**Key Features:**
-- Per-page error recovery for PDFs
-- Speaker notes extraction from PowerPoints
-- Automatic encoding fallback
-
-### Module 2: Text Preprocessing (`preprocessing/preprocessor.py`)
-- Cleans raw text (removes noise, URLs, emails)
-- Tokenizes into sentences
-- Filters out low-quality sentences
-- **Status:** 7/7 tests passing + 6 improvements applied
-
-**Recent Improvements:**
-1. Unicode combining character removal
-2. Reduced MIN_SENTENCE_LENGTH from 6 to 4 words
-3. Email/URL removal patterns
-4. ALL_CAPS header filtering
-5. Deduplication step
-6. Remove unused imports
-
-### Module 3: Sentence Ranking (`preprocessing/sentence_ranker.py`)
-- TF-IDF based importance scoring
-- NER entity boosting
-- Position-based weighting
-- Deduplication of similar sentences
-- **Status:** 5/5 tests passing + 5 improvements applied
-
-**Recent Improvements:**
-1. NER boost capped at 3 entities
-2. Deduplication moved to post-ranking
-3. max_features increased (500 → 1000)
-4. Position boost (early sentences ranked higher)
-5. Score clamping to [0, 1.0]
-
-### Module 4: Answer Extraction (`generation/answer_extractor.py`)
-- Hybrid NER + noun phrase extraction
-- Multi-criteria filtering (5 rules)
-- 4-component importance scoring
-- 7-type classification system
-- **Status:** 6/6 unit tests + integration test passing + 7 improvements applied
-
-**Recent Improvements:**
-1. **CRITICAL FIX:** Optimize NER computation (67% speedup)
-2. True frequency-based scoring (global, not always =1)
-3. Remove overlapping answers (keep longest forms)
-4. Prioritize NER answers (+0.1 boost)
-5. Answer position in sentence (new scoring signal)
-6. Minimum score threshold (filter low-quality)
-7. Efficiency improvements (reuse docs, batch ops)
-
-**Performance Gains:**
-- Speed: 4 sec → 1.5 sec (2.7x faster) ⚡
-- Quality: +10% improvement in average score 📈
-- Noise: 60% reduction in low-quality answers 🎯
-
-## 🧪 Testing
-
-### Run Integration Tests
-
-```bash
-# Test Modules 1-3
-python tests/test_integration_module1-3.py
-
-# Test Modules 1-4
-python tests/test_integration_module1-4.py
-```
-
-### Expected Output
-```
-Raw text: 1105 chars
-  → Preprocessed: 13 sentences
-  → Ranked top: 5 sentences
-  → Answers extracted: 13 total (2.6 per sentence)
-```
-
-## 📊 Key Metrics
-
-### Pipeline Performance (Full document)
-| Metric | Value |
-|--------|-------|
-| Extract Speed | ~50ms |
-| Preprocess Speed | ~100ms |
-| Ranking Speed | ~200ms |
-| Answer Extraction | ~150ms |
-| **Total** | **~500ms per document** |
-
-### Answer Quality
-| Metric | Value |
-|--------|-------|
-| Average Score | 0.72 / 1.0 |
-| Low-Quality Filter Rate | 8% |
-| Overlapping Removal | 100% |
-| NER Advantage | +10% |
-
-## 🔧 Configuration
-
-All modules use configurable thresholds:
-
-```python
-# preprocessing/preprocessor.py
-MIN_SENTENCE_LENGTH = 4  # Minimum words per sentence
-MIN_ALPHABETIC_RATIO = 0.5  # Ratio of letters to total chars
-
-# preprocessing/sentence_ranker.py
-DEFAULT_TOP_K = 10  # Top sentences to rank
-TFIDF_MAX_FEATURES = 1000  # TF-IDF vocabulary size
-NER_BOOST_CAP = 3  # Max entity boost
-
-# generation/answer_extractor.py
-MIN_SCORE_THRESHOLD = 0.3  # Minimum answer score
-NER_SOURCE_BOOST = 0.1  # NER source advantage
-MAX_ANSWER_LENGTH = 100  # Character limit
-```
-
-## 📚 Documentation
-
-Detailed documentation available in `/docs`:
-
-- **AQG_Project_Plan.md** - Original project specifications
-- **IMPROVEMENTS_MODULE3.md** - 5 sentence ranking improvements explained
-- **IMPROVEMENTS_MODULE4.md** - 7 answer extraction improvements explained
-- **MODULE4_EXPLANATION.md** - Answer extraction architecture & logic
-- **README_OLD.md** - Previous README (reference)
-
-## 🛠️ Dependencies
-
-Key packages (see `requirements.txt` for full list):
-- **torch** - Deep learning framework
-- **transformers** - Pre-trained models (BERT, GPT, etc.)
-- **spacy** - NLP pipeline (NER, POS tagging)
-- **scikit-learn** - TF-IDF, similarity metrics
-- **nltk** - Text processing, tokenization
-- **numpy** - Numerical operations
-- **PyMuPDF** - PDF extraction
-- **python-pptx** - PowerPoint extraction
-
-## 🎯 Next Steps
-
-### Module 5: Question Generation
-- Template-based question synthesis
-- Transformer-based paraphrasing
-- Quality scoring and ranking
-
-### Modules 6-9
-- Answer ranking
-- Post-processing and filtering
-- Evaluation metrics
-- Final integration
-
-## 📖 API Reference
-
-### Extract Answers
-
-```python
-from generation import extract_answers, get_answer_stats
-
-# Extract
-results = extract_answers(
-    sentences=['Text about AI.', 'Deep learning is powerful.'],
-    max_answers_per_sentence=3,
-    log_level=logging.INFO
-)
-
-# Get stats
-stats = get_answer_stats(results)
-print(stats)
-# {
-#     'total_sentences': 2,
-#     'total_answers': 6,
-#     'avg_answers_per_sentence': 3.0,
-#     'answer_types_distribution': {'CONCEPT': 4, 'DATE': 2},
-#     'avg_answer_length': 14.5,
-#     'source_distribution': {'NER': 2, 'NOUN_PHRASE': 4}
-# }
-```
-
-### Preprocess Text
-
-```python
-from preprocessing import preprocess, rank_sentences
-
-# Clean & tokenize
-sentences = preprocess('Raw document text here...')
-
-# Rank importance
-ranked = rank_sentences(sentences, top_k=5)
-```
-
-## ✨ Code Quality
-
-- ✅ **Fully tested** - Unit and integration tests passing
-- ✅ **Well documented** - Comprehensive docstrings
-- ✅ **Explainable** - No black-box APIs, all logic clear
-- ✅ **Production-ready** - Error handling, logging, configuration
-- ✅ **Efficient** - Optimized computation, minimal redundancy
-
-## 📝 License
-
-MIT
-
-## 👤 Author
-
--Pratham Rathod
--Sanjana Meena
-
-## 🤝 Contributing
-
-[Add contribution guidelines]
 
 ---
 
-**Last Updated:** April 24, 2026  
-**Project Status:** Modules 1-4 Complete ✅ | Module 5+ In Development
+## 💡 Usage Examples
 
+### Example 1: Generate MCQs from Text
+
+```python
+from pipeline.orchestrator import IntelliQuizzerPipeline
+
+# Initialize
+pipe = IntelliQuizzerPipeline()
+
+# Generate questions
+text = "Artificial Intelligence is transforming industries..."
+mcqs, metadata = pipe.run(
+    source=text,
+    max_questions=10,
+    max_sentences=20,
+    use_sentence_ranking=True
+)
+
+# Access results
+for mcq in mcqs:
+    print(f"Q: {mcq['question']}")
+    print(f"Answer: {mcq['answer']}")
+    print(f"Options: {mcq['options']}\n")
+```
+
+### Example 2: Generate from PDF (via UI)
+1. Open `http://localhost:8501`
+2. Go to **Generate MCQs** tab
+3. Upload PDF file
+4. Set number of questions (default: 20)
+5. Click "Generate"
+
+### Example 3: Export to Multiple Formats
+1. After generation, go to **Export** tab
+2. Select format (TXT, CSV, JSON, Anki, GIFT)
+3. Download file
+
+---
+
+## 🐛 Troubleshooting
+
+### Issue: ModuleNotFoundError when running app
+**Solution:**
+```bash
+# Ensure virtual environment is activated
+venv\Scripts\activate              # Windows
+source venv/bin/activate           # macOS/Linux
+
+# Reinstall dependencies
+pip install -r requirements.txt
+```
+
+### Issue: "No module named 'torch'" or GPU errors
+**Solution:**
+- Project auto-detects GPU; CPU mode is default
+- For GPU support, install: `pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118`
+
+### Issue: Models not downloading
+**Solution:**
+```bash
+python download_models.py
+# This may take 5-10 minutes depending on internet speed
+```
+
+### Issue: "Python version not supported" error
+**Solution:**
+- Ensure Python 3.11 is installed: `python --version`
+- Delete venv and recreate: `rmdir /s venv` (Windows) or `rm -rf venv` (macOS/Linux)
+- Recreate: `py -3.11 -m venv venv`
+
+### Issue: Memory error or crash on large PDFs
+**Solution:**
+- Reduce `max_sentences` in the UI (default: 30)
+- Split large PDFs into smaller chunks before uploading
+
+---
+
+## � Supported Formats
+
+### Input Files
+- ✅ **PDF** (`.pdf`) — via `pdfplumber`
+- ✅ **PowerPoint** (`.pptx`) — via `python-pptx`
+- ✅ **Plain Text** (`.txt`) — raw string input
+
+### Output Formats
+- 📝 **TXT** — Human-readable plain text
+- 📊 **CSV** — Spreadsheet-compatible format
+- 📦 **JSON** — Machine-readable structured data
+- 🧠 **Anki** — Compatible with Anki flashcard app
+- 🎓 **GIFT** — Moodle/Blackboard compatible format
+
+---
+
+## 📊 Configuration Options
+
+### In-App Settings (Generate MCQs Tab)
+- **Number of Questions** (1–50) — target MCQ count
+- **Max Sentences** (1–100) — limit sentences to process
+- **Use Sentence Ranking** (toggle) — enable TF-IDF importance scoring
+
+### Pipeline Parameters (`orchestrator.py`)
+```python
+pipe.run(
+    source,                          # Text or file
+    max_questions=20,                # Target MCQs
+    max_sentences=30,                # Max sentences to process
+    answers_per_sent=3,              # Answer candidates per sentence
+    use_sentence_ranking=True,       # Enable importance scoring
+    progress_callback=None           # Optional progress callback
+)
+```
+
+---
+
+## 🤝 Contributing & Development
+
+### Key Files to Modify
+
+| Goal | File |
+|------|------|
+| Add new export format | [utils/exporter.py](utils/exporter.py) |
+| Improve question filtering | [pipeline/mcq_builder.py](pipeline/mcq_builder.py) |
+| Change models | [pipeline/question_generator.py](pipeline/question_generator.py) / [pipeline/distractor_generator.py](pipeline/distractor_generator.py) |
+| Add UI tab | [app.py](app.py) |
+| Modify distractor logic | [pipeline/distractor_generator.py](pipeline/distractor_generator.py) |
+
+### Local Testing
+```bash
+# Run a single module
+python -c "from pipeline import preprocessor; print(preprocessor.preprocess('Your text here.'))"
+
+# Run full pipeline
+python -c "from pipeline.orchestrator import IntelliQuizzerPipeline; pipe = IntelliQuizzerPipeline(); mcqs, meta = pipe.run('Sample text'); print(len(mcqs), 'questions generated')"
+```
+
+---
+
+## ⚖️ License & Attribution
+
+- **Models:** All models are open-source (Hugging Face)
+- **Libraries:** See [requirements.txt](requirements.txt)
+- **RAG Backend:** DuckDuckGo API (free, no key required)
+
+---
+
+## 📝 Notes
+
+- **First Run:** Model download (~1.8 GB) takes 5–10 minutes
+- **Subsequent Runs:** Models cached locally; ~30–60 seconds per 20 questions
+- **Best Performance:** Python 3.11, Windows 10+, macOS 10.15+, Linux (Ubuntu 20.04+)
+- **Privacy:** All data stays local; no telemetry or tracking
+
+---
+
+## 🚀 Roadmap (Potential Future Enhancements)
+
+- [ ] GPU acceleration (CUDA support guide)
+- [ ] Fine-tuning on domain-specific corpora
+- [ ] Multi-language support
+- [ ] Question difficulty classification
+- [ ] Bloom's taxonomy alignment
+- [ ] REST API interface
+- [ ] Web-based frontend alternative
+
+---
+
+**Questions or Issues?** Create an issue or check the [LLM_prompts/](LLM_prompts/) folder for detailed technical documentation.
+
+Happy Learning! 🎓

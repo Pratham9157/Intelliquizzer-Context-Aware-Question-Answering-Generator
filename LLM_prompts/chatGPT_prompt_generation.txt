@@ -22,4 +22,31 @@
 8)this was the work done for module 4... how does it look to you?
 
 
-9)
+9)are there some good datasets for fine tuning? if yes how much compute will it require to fine tune on colab/kaggle to train and fine turn and get weights and biases? why not do training for once for our project and then used the fine tuned model there after?
+
+
+10)this is what the coding agent did for the prompt of module 5... also this is what the agent checked ... The integration test passes successfully with all 5 modules working together: Pipeline Flow: 853 character raw text → 10 preprocessed sentences → 5 ranked sentences → 13 extracted answers → 13 generated questions Final Results: Answer Extraction: 13 answers from 5 sentences (avg 2.6 per sentence) Question Generation: 13 questions (avg length 27.6 chars, avg score 0.708) All questions properly formatted with answer types and quality scores Sample Generated Questions: "Neural networks with multiple layers to process complex data?" (Answer: "Deep learning", Score: 0.669) "Machine learning is a subset of Artificial Intelligence?" (Answer: "Machine learning", Score: 0.969) "Transforming modern industries?" (Answer: "Artificial Intelligence and Machine Learning", Score: 0.700) but this seem a little odd, is it correctly working and what are your suggestions for this module?
+
+
+11)yeah, give me the refinement prompt for module5 as well
+
+
+12)okay i wanna improve the colab notebook so give me a prompt which i will give to claude so it generate a perfect model fine tuning notebook, the prompt will guide claude according to the pipeline and our structure
+
+
+13)i have copied the folder to the project directory, give me a prompt to do all these changes
+
+
+14)so lets go, design me a prompt for the next module
+
+
+15)so what we have left is to, create a dashboard connect to a database so i can store the documents for future querying for Q and A as well other improvements
+
+
+16)Rag implementation and usage is also left to fetch some other QA which are not on our doc but imp right?
+
+
+17)okay then remember the order of implementation and lets proceed with UI, design me a prompt for the UI development phase
+
+
+18)

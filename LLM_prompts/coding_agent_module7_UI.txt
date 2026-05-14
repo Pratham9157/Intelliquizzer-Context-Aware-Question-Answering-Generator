@@ -1,0 +1,280 @@
+You are a senior full-stack AI engineer.
+
+I have built a complete NLP pipeline for:
+
+"AI-Powered Document Assessment & Question Generation System"
+
+The backend pipeline is already implemented and includes:
+
+* Text extraction (PDF/TXT)
+* Preprocessing
+* Sentence ranking
+* Answer extraction
+* Question generation (fine-tuned T5)
+* MCQ generation (with distractors)
+* Output formatting (MCQ, ShortAnswer, FAQ)
+
+Your task is to build a **professional Streamlit dashboard** to interact with this system.
+
+---
+
+# ⚠️ IMPORTANT RULES
+
+* Do NOT modify backend logic
+* Only build UI layer and connect to existing modules
+* Keep UI clean, modern, and intuitive
+* Avoid overcomplication
+* Ensure smooth user experience
+
+---
+
+# 🎯 OBJECTIVE
+
+Create a dashboard where users can:
+
+1. Upload or input text
+2. Run the pipeline
+3. View structured outputs:
+
+   * Extracted text
+   * Questions
+   * MCQs
+   * FAQs
+
+---
+
+# 📁 FILE STRUCTURE
+
+Create:
+
+```text
+app.py
+utils/ui_helpers.py
+```
+
+---
+
+# 🧩 UI FEATURES (MANDATORY)
+
+---
+
+## 1. 🏠 HEADER
+
+* Title:
+  "AI Document Assessment System"
+* Subtitle:
+  "Generate Questions, MCQs, and FAQs from Documents"
+
+---
+
+## 2. 📥 INPUT SECTION
+
+### Options:
+
+### A. File Upload
+
+```python
+st.file_uploader("Upload Document", type=["pdf", "txt"])
+```
+
+### B. Text Input
+
+```python
+st.text_area("Or paste your text here")
+```
+
+---
+
+## 3. ⚙️ CONTROL PANEL
+
+* Button:
+
+```python
+st.button("Generate Questions")
+```
+
+* Optional:
+
+  * Select number of questions
+  * Toggle MCQ / FAQ / ShortAnswer
+
+---
+
+## 4. 🔄 PROCESSING INDICATOR
+
+Use:
+
+```python
+with st.spinner("Processing document..."):
+```
+
+---
+
+## 5. 📊 OUTPUT DISPLAY (VERY IMPORTANT)
+
+Organize using tabs:
+
+```python
+tab1, tab2, tab3 = st.tabs(["Questions", "MCQs", "FAQs"])
+```
+
+---
+
+### 📌 TAB 1: QUESTIONS
+
+Display:
+
+```text
+Q: ...
+A: ...
+Type: PERSON / LOCATION / CONCEPT
+Score: 0.85
+```
+
+---
+
+### 📌 TAB 2: MCQs
+
+Display:
+
+```text
+Q: Who developed relativity?
+
+A. Isaac Newton  
+B. Albert Einstein ✅  
+C. Tesla  
+D. Galileo  
+```
+
+Highlight correct answer.
+
+---
+
+### 📌 TAB 3: FAQ
+
+Display:
+
+```text
+Q: What is machine learning?
+A: Machine learning is a subset of AI...
+```
+
+---
+
+## 6. 📄 OPTIONAL: RAW TEXT VIEW
+
+Expandable section:
+
+```python
+st.expander("View Extracted Text")
+```
+
+---
+
+## 7. 📈 STATS PANEL (BONUS)
+
+Show:
+
+```text
+Total Questions Generated
+Average Score
+Number of MCQs
+```
+
+---
+
+# 🔗 BACKEND INTEGRATION
+
+You must call existing pipeline functions like:
+
+```python
+from pipeline import run_pipeline
+```
+
+Expected output format:
+
+```python
+{
+  "MCQ": [...],
+  "ShortAnswer": [...],
+  "FAQ": [...]
+}
+```
+
+---
+
+# 🎨 UI DESIGN GUIDELINES
+
+* Use:
+
+  * st.columns for layout
+  * st.markdown for styling
+* Keep spacing clean
+* Use emojis/icons sparingly (optional)
+* Ensure readability
+
+---
+
+# ⚠️ ERROR HANDLING
+
+Handle:
+
+* Empty input
+* Unsupported file
+* Pipeline failure
+
+Show user-friendly messages:
+
+```python
+st.error("Please upload a valid document")
+```
+
+---
+
+# 🧪 TESTING
+
+Ensure:
+
+* Upload works
+* Text input works
+* Outputs render correctly
+* No crashes
+
+---
+
+# 📌 OUTPUT FORMAT
+
+Provide:
+
+1. Full `app.py`
+2. Any helper functions
+3. Explanation of UI flow
+4. Instructions to run:
+
+```bash
+streamlit run app.py
+```
+
+---
+
+# 🚫 DO NOT
+
+* Do NOT rewrite backend modules
+* Do NOT hardcode outputs
+* Do NOT use external APIs
+* Do NOT overdesign UI
+
+---
+
+# 🎯 GOAL
+
+Build a **clean, interactive, and demo-ready dashboard** that makes the system look like a real AI product.
+
+The UI should clearly demonstrate:
+
+* Input → Processing → Output
+* All key features of the pipeline
+
+---
+
+After implementation, STOP and wait for further instructions.

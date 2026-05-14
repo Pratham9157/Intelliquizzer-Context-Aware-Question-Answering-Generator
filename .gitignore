@@ -1,3 +1,11 @@
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -23,33 +31,35 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Virtual environments
-.venv/
-venv/
-ENV/
-env/
-.env
+# Pip
+pip-log.txt
+pip-delete-this-directory.txt
 
-# IDE
+# IDE & Editors
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
 
-# Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
+# Streamlit
+.streamlit/secrets.toml
+.streamlit/config.toml
 
-# Data / Models
-*.pkl
-*.pickle
-*.h5
-*.pt
-*.pth
+# Models (pre-downloaded, usually large)
 models/
-data/
+*.bin
+*.model
+*.safetensors
+
+# Cache
+.cache/
+*.cache
+cache/
 
 # Logs
 *.log
@@ -57,9 +67,20 @@ logs/
 
 # OS
 .DS_Store
-Thumbs.db
+.env
+.env.local
+.env.*.local
 
-# Project specific
-.cache/
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+
+# Local test files
+test_output/
+test_files/
 temp/
-tmp/

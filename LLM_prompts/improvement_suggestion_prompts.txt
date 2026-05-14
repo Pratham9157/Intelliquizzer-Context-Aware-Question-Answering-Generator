@@ -402,3 +402,744 @@ Provide:
 Upgrade this module into a:
 **high-quality, efficient, and intelligent answer extraction system suitable for real-world NLP pipelines and interviews.**
 """
+
+
+prompt 3: module 5
+
+"""
+You are a senior NLP engineer improving an existing Question Generation module built using T5.
+
+The module already:
+
+* Uses T5-small for generation
+* Accepts (answer, context)
+* Generates questions using beam search
+* Performs basic post-processing
+
+Your task is to apply TARGETED IMPROVEMENTS to significantly improve question quality WITHOUT rewriting the entire module.
+
+---
+
+## ⚠️ IMPORTANT RULES
+
+* Do NOT rewrite the entire file
+* Modify only relevant functions
+* Preserve existing structure and APIs
+* Add clear comments explaining each improvement
+* Maintain compatibility with existing pipeline (Module 4 output)
+
+---
+
+# 🎯 REQUIRED IMPROVEMENTS
+
+---
+
+## 1. 🧠 Improve Input Prompt (CRITICAL FIX)
+
+### Problem:
+
+Current prompt:
+
+```python
+generate question: answer: X context: Y
+```
+
+Produces weak and generic questions.
+
+---
+
+### Fix:
+
+Make prompt more explicit and instructive.
+
+Update `format_input()` to:
+
+```python
+generate a question whose answer is: {answer} based on the context: {context}
+```
+
+---
+
+## 2. 🎯 Add Answer-Type Aware Prompting (MAJOR IMPROVEMENT)
+
+### Problem:
+
+Model does not know what kind of question to generate.
+
+---
+
+### Fix:
+
+Use answer type to guide generation.
+
+Update `format_input()`:
+
+Mapping:
+
+* PERSON → "who"
+* LOCATION → "where"
+* DATE → "when"
+* CONCEPT → "what"
+* OTHER → "what"
+
+Example:
+
+```python
+generate a who question whose answer is: Albert Einstein based on the context: ...
+```
+
+---
+
+## 3. 🧹 Add Question Quality Filtering
+
+### Problem:
+
+Model generates incomplete or non-question outputs.
+
+---
+
+### Fix:
+
+Add validation after generation.
+
+Reject questions that:
+
+* Do NOT contain question words:
+
+  * who, what, where, when, why, how
+* Are too short (< 5 words)
+* Are too similar to the input sentence
+
+Implement:
+
+```python
+is_valid_question(question: str, context: str) -> bool
+```
+
+---
+
+## 4. 🔁 Generate Multiple Candidates and Select Best
+
+### Problem:
+
+Single output may be weak.
+
+---
+
+### Fix:
+
+Generate multiple candidates and select best one.
+
+Update generation:
+
+```python
+num_return_sequences = 3
+```
+
+Then:
+
+* Score each candidate
+* Select best based on:
+
+  * question score
+  * presence of question word
+  * length quality
+
+---
+
+## 5. ⭐ Improve Question Scoring Function
+
+Enhance `_calculate_question_score()`:
+
+Add:
+
+* Bonus if question starts with:
+
+  * Who / What / Where / When / Why / How
+* Penalty if:
+
+  * Question is too similar to context
+* Penalty if:
+
+  * Question is incomplete fragment
+
+---
+
+## 6. 🚫 Prevent Statement-to-Question Conversion
+
+### Problem:
+
+Statements become questions with just '?' appended
+
+Example:
+"Machine learning is a subset of AI?"
+
+---
+
+### Fix:
+
+Add rule:
+
+* Reject questions starting with:
+
+  * "Machine learning is"
+  * "Artificial intelligence is"
+    (general pattern: subject + "is")
+
+Implement heuristic:
+
+```python
+if question.lower().startswith(context.split()[0].lower()):
+    penalize or discard
+```
+
+---
+
+## 7. ⚡ Minor Improvements
+
+* Ensure consistent capitalization
+* Remove duplicate questions per sentence
+* Add logging for:
+
+  * rejected questions
+  * selected best candidate
+
+---
+
+# 🧪 TEST UPDATES
+
+Update test suite to verify:
+
+* Questions contain proper WH-word
+* No statement-like questions
+* Multiple candidates generated and best selected
+* Output quality improved visibly
+
+---
+
+# 📌 OUTPUT FORMAT
+
+Provide:
+
+1. Updated code snippets (ONLY modified parts)
+2. Explanation of each improvement
+3. Example before vs after output
+4. Any new helper functions
+
+---
+
+## 🚫 DO NOT
+
+* Do NOT change model architecture
+* Do NOT introduce external APIs
+* Do NOT remove existing functionality
+* Do NOT overcomplicate logic
+
+---
+
+## 🎯 GOAL
+
+Upgrade this module into a:
+**controlled, high-quality question generation system that produces meaningful, well-structured questions suitable for real-world usage and interviews.**
+"""
+
+
+
+
+prompt 4: Module 5 Improvements
+
+
+"""
+You are a senior NLP engineer improving an existing Transformer-based Question Generation module (T5).
+
+The module already:
+
+* Uses T5-small
+* Generates multiple candidates (beam search)
+* Performs validation, cleaning, and scoring
+* Integrates with an answer extraction pipeline
+
+Your task is to apply CRITICAL TARGETED FIXES to improve question quality and selection logic.
+
+---
+
+## ⚠️ IMPORTANT RULES
+
+* Do NOT rewrite the entire module
+* Modify only necessary functions
+* Preserve existing architecture
+* Add comments explaining each fix
+* Maintain compatibility with current pipeline
+
+---
+
+# 🎯 REQUIRED FIXES
+
+---
+
+## 1. 🏆 Select BEST Candidate Using Scoring (CRITICAL)
+
+### Problem:
+
+Currently selecting:
+
+```python
+best_question = valid_candidates[0]
+```
+
+This ignores your scoring system.
+
+---
+
+### Fix:
+
+After generating valid candidates:
+
+```python
+scored_candidates = [
+    (q, self._calculate_question_score(q, answer, context, 0.5, answer_type))
+    for q in valid_candidates
+]
+
+best_question = max(scored_candidates, key=lambda x: x[1])[0]
+```
+
+---
+
+### Requirement:
+
+* Use existing scoring function
+* Do NOT assume first candidate is best
+
+---
+
+## 2. 🧠 Improve Prompt Engineering (VERY IMPORTANT)
+
+### Problem:
+
+Current format uses:
+
+```python
+[WHO] Albert Einstein
+```
+
+This is not optimal for T5.
+
+---
+
+### Fix:
+
+Modify `format_input()` to use natural language prompts:
+
+Mapping:
+
+* PERSON → "who"
+* LOCATION → "where"
+* DATE → "when"
+* CONCEPT → "what"
+
+---
+
+### New format:
+
+```python
+generate a {question_type} question: answer: {answer} context: {context}
+```
+
+---
+
+### Example:
+
+```python
+generate a who question: answer: Albert Einstein context: Albert Einstein developed relativity.
+```
+
+---
+
+## 3. 🧹 Strengthen Question Validation
+
+### Problem:
+
+Validation is too permissive → weak outputs pass
+
+---
+
+### Fix:
+
+Update `is_valid_question()` to include:
+
+```python
+if not any(qw in question.lower() for qw in ["who","what","where","when","why","how"]):
+    return False
+```
+
+---
+
+### Keep existing checks:
+
+* Ends with '?'
+* Not identical to context
+* Minimum length
+
+---
+
+## 4. 🛡️ Add Fallback Strategy (IMPORTANT)
+
+### Problem:
+
+If all candidates fail → empty output
+
+---
+
+### Fix:
+
+Add fallback:
+
+```python
+if not valid_candidates:
+    return f"What is {answer}?"
+```
+
+---
+
+### Requirement:
+
+* Ensure pipeline never breaks
+* Always return a usable question
+
+---
+
+## 5. ⚡ Minor Improvements
+
+* Ensure deduplication still works
+* Log when fallback is used
+* Keep scoring logic unchanged (reuse existing)
+
+---
+
+# 🧪 TEST UPDATES
+
+Update tests to verify:
+
+* Best candidate is selected (not first)
+* Questions start with proper WH-word
+* Fallback works when needed
+* Output quality improves vs previous version
+
+---
+
+# 📌 OUTPUT FORMAT
+
+Provide:
+
+1. Updated code snippets (ONLY modified parts)
+2. Explanation of each fix
+3. Example before vs after outputs
+4. Any new helper logic
+
+---
+
+## 🚫 DO NOT
+
+* Do NOT rewrite entire module
+* Do NOT change model or architecture
+* Do NOT introduce external APIs
+* Do NOT overcomplicate
+
+---
+
+## 🎯 GOAL
+
+Upgrade this module into a:
+**robust, controlled, and high-quality question generation system that selects the best possible output from multiple candidates.**
+"""
+
+
+
+
+prompt 5: module 6 improvement
+"""
+You are a senior NLP engineer improving an existing MCQ generation module.
+
+The system already includes:
+
+* Hybrid distractor generation (WordNet + context-based)
+* MCQ builder
+* Output formatter (MCQ, ShortAnswer, FAQ)
+* Full pipeline integration and testing
+
+Your task is to apply TARGETED IMPROVEMENTS to increase distractor quality, realism, and overall output quality WITHOUT rewriting the system.
+
+---
+
+# ⚠️ IMPORTANT RULES
+
+* Do NOT rewrite the entire module
+* Modify only relevant functions
+* Preserve architecture and APIs
+* Keep all existing functionality intact
+* Add comments explaining each improvement
+* Maintain compatibility with existing pipeline
+
+---
+
+# 🎯 REQUIRED IMPROVEMENTS
+
+---
+
+## 1. 🧹 Improve WordNet Distractor Quality (CRITICAL)
+
+### Problem:
+
+WordNet produces generic or meaningless distractors:
+
+* "entity", "object", "thing"
+
+---
+
+### Fix:
+
+Inside `get_wordnet_distractors()`:
+
+Add filtering:
+
+```python
+if len(word.split()) > 3:
+    continue
+
+if word.lower() in ["entity", "object", "thing", "physical entity"]:
+    continue
+```
+
+---
+
+### Goal:
+
+Keep distractors:
+
+* concise
+* meaningful
+* human-like
+
+---
+
+## 2. 🧠 Add Semantic Similarity Filtering (IMPORTANT)
+
+### Problem:
+
+Distractors can be:
+
+* too similar to answer
+* duplicates in disguise
+
+---
+
+### Fix:
+
+Add helper:
+
+```python
+from difflib import SequenceMatcher
+
+def similarity(a, b):
+    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
+```
+
+---
+
+Apply in `generate_distractors()`:
+
+```python
+if similarity(answer, d) > 0.8:
+    continue
+```
+
+---
+
+### Goal:
+
+Avoid:
+
+* near duplicates
+* trivial distractors
+
+---
+
+## 3. 🎯 Add Type-Specific Fallback Distractors (HIGH IMPACT)
+
+### Problem:
+
+Fallback options like:
+"Option A", "Option B"
+
+Look unprofessional.
+
+---
+
+### Fix:
+
+Replace fallback logic with:
+
+```python
+if answer_type == "PERSON":
+    fallback = ["John Doe", "Jane Smith", "Michael Johnson"]
+elif answer_type == "LOCATION":
+    fallback = ["London", "New York", "Tokyo"]
+elif answer_type == "DATE":
+    fallback = ["1990", "2000", "2010"]
+elif answer_type == "CONCEPT":
+    fallback = ["Alternative concept", "Different approach", "Related idea"]
+else:
+    fallback = ["Option A", "Option B", "Option C"]
+```
+
+---
+
+### Goal:
+
+Make MCQs look realistic and professional
+
+---
+
+## 4. 🔀 Improve MCQ Option Shuffling (OPTIONAL)
+
+### Problem:
+
+Random behavior is not reproducible
+
+---
+
+### Fix:
+
+Before shuffle:
+
+```python
+random.seed(42)
+random.shuffle(all_options)
+```
+
+---
+
+### Goal:
+
+* consistent results during testing/demo
+
+---
+
+## 5. ⚖️ Improve MCQ Suitability Filtering
+
+### Problem:
+
+All answers converted to MCQs, even poor ones
+
+---
+
+### Fix in `format_output()`:
+
+Add condition:
+
+```python
+if len(answer.split()) > 6:
+    skip MCQ generation
+```
+
+---
+
+### Goal:
+
+Avoid:
+
+* long descriptive answers as MCQs
+* poor question quality
+
+---
+
+## 6. 📚 Improve FAQ Filtering
+
+### Problem:
+
+FAQ selection too naive
+
+---
+
+### Fix in `is_faq_suitable()`:
+
+Enhance logic:
+
+```python
+if len(answer.split()) > 5:
+    return True
+```
+
+Keep existing WH-word logic as well.
+
+---
+
+### Goal:
+
+FAQ contains:
+
+* informative answers
+* not trivial facts
+
+---
+
+## 7. 🧪 Add Logging for Debugging
+
+Add logs for:
+
+* filtered distractors
+* fallback usage
+* skipped MCQs
+
+Example:
+
+```python
+logger.debug(f"Filtered distractor: {word}")
+logger.info(f"Using fallback distractors for {answer}")
+```
+
+---
+
+## 8. 🧪 TEST UPDATES
+
+Update tests to verify:
+
+* No generic distractors like "entity"
+* Distractors are distinct from answer
+* Fallbacks look realistic
+* MCQs skipped for long answers
+* FAQ contains only informative questions
+
+---
+
+# 📌 OUTPUT FORMAT
+
+Provide:
+
+1. Updated code snippets (ONLY modified parts)
+2. Explanation of each improvement
+3. Example before vs after outputs
+4. Any new helper functions added
+
+---
+
+## 🚫 DO NOT
+
+* Do NOT rewrite entire files
+* Do NOT remove existing logic
+* Do NOT introduce external APIs
+* Do NOT break integration with previous modules
+
+---
+
+# 🎯 GOAL
+
+Upgrade the MCQ generation system into a:
+
+**high-quality, realistic, and professional assessment generator with strong distractors and meaningful output formats.**
+"""
+
+
+
+prompt 6 : 

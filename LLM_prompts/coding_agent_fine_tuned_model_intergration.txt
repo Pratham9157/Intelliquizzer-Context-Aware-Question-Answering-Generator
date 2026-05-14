@@ -1,0 +1,170 @@
+You are a senior NLP engineer improving an existing Question Generation module.
+
+The system already implements:
+
+* T5-based question generation
+* Multi-candidate decoding
+* Validation, scoring, and selection
+* Full pipeline integration with answer extraction
+
+Now I have a **fine-tuned T5 model stored locally in folder:**
+
+my_qg_model/
+
+Your task is to integrate this trained model into the existing module WITHOUT breaking the architecture.
+
+---
+
+# ⚠️ IMPORTANT RULES
+
+* Do NOT rewrite the entire module
+* Modify ONLY model loading and inference parts
+* Preserve all existing logic:
+
+  * prompt formatting
+  * candidate generation
+  * scoring
+  * validation
+* Ensure compatibility with CPU and GPU
+* Keep code clean and production-ready
+
+---
+
+# 🎯 REQUIRED CHANGES
+
+---
+
+## 1. 🔁 Replace Pretrained Model with Local Model
+
+### Current:
+
+```python
+T5ForConditionalGeneration.from_pretrained("t5-small")
+T5Tokenizer.from_pretrained("t5-small")
+```
+
+---
+
+### Replace with:
+
+```python
+T5ForConditionalGeneration.from_pretrained("my_qg_model")
+T5Tokenizer.from_pretrained("my_qg_model")
+```
+
+---
+
+## 2. ⚙️ Add Device Handling (IMPORTANT)
+
+Add:
+
+```python
+import torch
+
+self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+self.model.to(self.device)
+```
+
+---
+
+## 3. 🔄 Move Inputs to Device
+
+Update generation step:
+
+```python
+inputs = tokenizer(input_text, return_tensors="pt").to(self.device)
+```
+
+---
+
+## 4. 🧠 Ensure Model is in Evaluation Mode
+
+Add after loading:
+
+```python
+self.model.eval()
+```
+
+---
+
+## 5. ⚠️ VERIFY INPUT FORMAT MATCHES TRAINING
+
+Training used:
+
+```text
+generate a {type} question: answer: {answer} context: {context}
+```
+
+Ensure your format_input() EXACTLY matches this.
+
+DO NOT change this format.
+
+---
+
+## 6. 🧪 Add Debug Logging (IMPORTANT)
+
+Add:
+
+```python
+print(f"[INFO] Using model from: {self.model.name_or_path}")
+```
+
+---
+
+## 7. 🚀 Ensure No Fallback to t5-small
+
+Verify:
+
+* No reference to "t5-small" remains anywhere
+
+---
+
+## 8. 🧪 Add Test Snippet
+
+At end of module:
+
+```python
+if __name__ == "__main__":
+    qg = QuestionGenerator()
+    
+    test_input = "generate a who question: answer: Albert Einstein context: Albert Einstein developed relativity."
+    
+    print(qg.generate_question("Albert Einstein", "Albert Einstein developed relativity.", "PERSON"))
+```
+
+---
+
+# 📌 OUTPUT FORMAT
+
+Provide:
+
+1. Updated code snippets (ONLY modified parts)
+2. Explanation of each change
+3. Confirmation that trained model is used
+4. Any potential issues to watch
+
+---
+
+## 🚫 DO NOT
+
+* Do NOT change model architecture
+* Do NOT remove scoring/validation logic
+* Do NOT break pipeline integration
+* Do NOT introduce external APIs
+
+---
+
+# 🎯 GOAL
+
+Integrate the fine-tuned model into the system so that:
+
+* Question quality improves significantly
+* Pipeline remains stable
+* Inference works efficiently on CPU/GPU
+
+---
+
+Your output should upgrade the system from:
+“pretrained model usage”
+to:
+“trained model-powered intelligent question generation”

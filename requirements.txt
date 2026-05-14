@@ -1,22 +1,28 @@
-torch>=2.0.0
-transformers>=4.35.0
-datasets>=2.14.0
-sentencepiece>=0.1.99
-tokenizers>=0.14.0
-spacy>=3.6.0
-nltk>=3.8.1
+# IntelliQuizzer v4 — Requirements
+# pip install -r requirements.txt
+# Python 3.11 required (3.14 not supported by torch/tokenizers)
+# No API keys — all models run locally.
+
+# ── Core UI ───────────────────────────────────────────────────────────────────
+streamlit>=1.35.0
+
+# ── Local AI models ───────────────────────────────────────────────────────────
+# Pin below 4.52: that version removed the text2text-generation pipeline task
+transformers>=4.40.0,<4.52.0
+torch>=2.1.0                   # CPU is fine; GPU auto-detected
+sentencepiece>=0.1.99          # Required by T5 tokenizer
+sentence-transformers>=2.7.0   # M4 keyword extraction + M6 distractor clustering
+
+# ── NLP / file processing ─────────────────────────────────────────────────────
 scikit-learn>=1.3.0
+pdfplumber>=0.11.0
+python-pptx>=0.6.23
+
+# ── Web RAG (free, no API key) ────────────────────────────────────────────────
+ddgs>=1.0.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+
+# ── Utilities ─────────────────────────────────────────────────────────────────
 numpy>=1.24.0
-pandas>=2.0.0
-textstat>=0.7.3
-rouge-score>=0.1.2
-bert-score>=0.3.13
-PyMuPDF>=1.23.0
-python-pptx>=0.6.21
-streamlit>=1.28.0
-fastapi>=0.104.0
-uvicorn>=0.24.0
-matplotlib>=3.7.0
-seaborn>=0.12.0
-tqdm>=4.65.0
-chardet>=5.2.0

@@ -1,0 +1,48 @@
+2026-04-26 00:40:04,568 - __main__ - INFO - Pipeline configuration: 10 questions
+2026-04-26 00:40:04,568 - __main__ - INFO - Starting pipeline execution...
+2026-04-26 00:40:04,569 - preprocessing.preprocessor - INFO - Starting preprocessing pipeline (974 input chars)
+2026-04-26 00:40:04,602 - preprocessing.preprocessor - INFO - Tokenized into 7 sentences
+2026-04-26 00:40:04,603 - preprocessing.preprocessor - INFO - Preprocessing complete: 7 final sentences
+2026-04-26 00:40:04,603 - __main__ - INFO - Preprocessed 7 sentences
+2026-04-26 00:40:04,603 - preprocessing.sentence_ranker - INFO - Starting sentence ranking pipeline (7 input sentences)
+2026-04-26 00:40:04,603 - preprocessing.sentence_ranker - INFO - Step 1: TF-IDF vectorization...
+2026-04-26 00:40:04,606 - preprocessing.sentence_ranker - INFO - Step 2: Computing document centroid...
+2026-04-26 00:40:04,607 - preprocessing.sentence_ranker - INFO - Step 3: Scoring sentences by TF-IDF similarity...
+2026-04-26 00:40:04,608 - preprocessing.sentence_ranker - INFO - Step 4: Applying NER boosting (capped at 3 entities)...
+2026-04-26 00:40:04,681 - preprocessing.sentence_ranker - INFO - Step 5: Applying position boost (early sentences favored)...
+2026-04-26 00:40:04,681 - preprocessing.sentence_ranker - INFO - Step 7: Normalizing scores to [0, 1.0]...
+2026-04-26 00:40:04,682 - preprocessing.sentence_ranker - INFO - Step 8: Selecting top-7 sentences...
+2026-04-26 00:40:04,682 - preprocessing.sentence_ranker - INFO - Step 9: Removing duplicates from top-7 results...
+2026-04-26 00:40:04,684 - preprocessing.sentence_ranker - INFO - Ranking complete: returned 7 top sentences (after deduplication, original top-K was 7)
+2026-04-26 00:40:04,684 - __main__ - INFO - Ranked 7 important sentences
+2026-04-26 00:40:04,684 - generation.answer_extractor - INFO - Starting answer extraction pipeline (7 sentences)
+2026-04-26 00:40:04,972 - generation.answer_extractor - INFO - Answer extraction complete: 21 answers from 7 sentences
+2026-04-26 00:40:04,973 - __main__ - INFO - Extracted 21 potential Q&A items
+2026-04-26 00:40:04,973 - generation.question_generator - INFO - Loading fine-tuned T5 model from: my_qg_model
+2026-04-26 00:40:04,973 - generation.question_generator - INFO - Device: cpu (CUDA available: False)
+Loading weights: 100%|███████████████████████████████████████████████████████████████████████| 131/131 [00:00<00:00, 5843.02it/s]
+2026-04-26 00:40:05,210 - generation.question_generator - INFO - [SUCCESS] Loaded fine-tuned T5 model on cpu
+2026-04-26 00:40:05,210 - generation.question_generator - INFO - [INFO] Model path: my_qg_model
+2026-04-26 00:40:05,210 - generation.question_generator - INFO - [INFO] Model is in evaluation mode
+2026-04-26 00:40:06,051 - generation.question_generator - WARNING - Using fallback: What is Soil pollution?
+2026-04-26 00:40:06,216 - generation.question_generator - WARNING - Using fallback: What is chemical waste?
+2026-04-26 00:40:06,398 - generation.question_generator - WARNING - Using fallback: What is excessive fertilizers?
+2026-04-26 00:40:06,826 - generation.question_generator - WARNING - Using fallback: What is Air pollution?
+2026-04-26 00:40:07,048 - generation.question_generator - WARNING - Using fallback: What is factory emissions?
+2026-04-26 00:40:07,179 - generation.question_generator - WARNING - Using fallback: What is vehicle smoke?
+2026-04-26 00:40:07,422 - generation.question_generator - WARNING - Using fallback: What is the introduction?
+2026-04-26 00:40:07,800 - generation.question_generator - WARNING - Using fallback: What is Pollution?
+2026-04-26 00:40:07,912 - generation.question_generator - WARNING - Using fallback: What is harmful substances?
+2026-04-26 00:40:08,190 - generation.question_generator - WARNING - Using fallback: What is immediate action?
+2026-04-26 00:40:08,190 - __main__ - INFO - Generated 10 questions
+Only 0 distractors found, need 3. Using fallback options.
+Only 0 distractors found, need 3. Using fallback options.
+Only 0 distractors found, need 3. Using fallback options.
+Only 0 distractors found, need 3. Using fallback options.
+Only 0 distractors found, need 3. Using fallback options.
+Only 0 distractors found, need 3. Using fallback options.
+Only 0 distractors found, need 3. Using fallback options.
+Only 0 distractors found, need 3. Using fallback options.
+2026-04-26 00:40:10,118 - __main__ - INFO - Pipeline execution completed successfully
+
+look at the logs, this shows that we are not actually generating any questions, its just questions due to fallback

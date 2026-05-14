@@ -1,0 +1,268 @@
+let me give you another example...
+Short Answer Questions
+Question 1
+Q: What is Mary?
+
+A: Mary
+
+Score: 0.89
+
+Type: PERSON
+
+Question 2
+Q: What is BLEU?
+
+A: BLEU
+
+Score: 0.82
+
+Type: ORGANIZATION
+
+Question 3
+Q: What is the green witch?
+
+A: the green witch
+
+Score: 0.69
+
+Type: CONCEPT
+
+Question 4
+Q: What is 63Maria nodiounabofetada?
+
+A: 63Maria nodiounabofetada
+
+Score: 0.89
+
+Type: ORGANIZATION
+
+Question 5
+Q: What is partial translation •Mark foreign words?
+
+A: partial translation •Mark foreign words
+
+Score: 0.75
+
+Type: CONCEPT
+
+Question 6
+Q: What is Philipp KoehnDan Jurafsky Decoding?
+
+A: Philipp KoehnDan Jurafsky Decoding
+
+Score: 0.73
+
+Type: CONCEPT
+
+Question 7
+Q: What is English?
+
+A: English
+
+Score: 0.90
+
+Type: OTHER
+
+Question 8
+Q: What is bitextDan Jurafsky?
+
+A: bitextDan Jurafsky
+
+Score: 0.85
+
+Type: LOCATION
+
+Question 9
+Q: What is monolingual knowledge!Dan Jurafsky Faithfulness?
+
+A: monolingual knowledge!Dan Jurafsky Faithfulness
+
+Score: 0.76
+
+Type: CONCEPT
+
+Question 10
+Q: What is Candidate 2 Unigram Precision?
+
+A: Candidate 2 Unigram Precision
+
+Score: 0.98
+
+Multiple Choice Questions
+Question 1
+Q: What is Mary?
+
+Score: 0.89
+
+A. Virgin Mary
+B. The Virgin
+C. Madonna
+D. Mary ✅
+Type: PERSON
+
+Question 2
+Q: What is BLEU?
+
+Score: 0.82
+
+A. blue cheese
+B. gorgonzola
+C. Danish blue
+D. BLEU ✅
+Type: ORGANIZATION
+
+Question 3
+Q: What is the green witch?
+
+Score: 0.69
+
+A. Different method
+B. Alternative approach
+C. Related concept
+D. the green witch ✅
+Type: CONCEPT
+
+Question 4
+Q: What is 63Maria nodiounabofetada?
+
+Score: 0.89
+
+A. Microsoft Corp.
+B. Apple Inc.
+C. Google LLC
+D. 63Maria nodiounabofetada ✅
+Type: ORGANIZATION
+
+Question 5
+Q: What is partial translation •Mark foreign words?
+
+Score: 0.75
+
+A. Different method
+B. Alternative approach
+C. Related concept
+D. partial translation •Mark foreign words ✅
+Type: CONCEPT
+
+Question 6
+Q: What is Philipp KoehnDan Jurafsky Decoding?
+
+Score: 0.73
+
+A. Different method
+B. Alternative approach
+C. Related concept
+D. Philipp KoehnDan Jurafsky Decoding ✅
+Type: CONCEPT
+
+Question 7
+Q: What is English?
+
+Score: 0.90
+
+A. English people
+B. Faithfulness
+C. nation
+D. English ✅
+Type: OTHER
+
+Question 8
+Q: What is bitextDan Jurafsky?
+
+Score: 0.85
+
+A. •Mary
+B. Faithfulness
+C. London
+D. bitextDan Jurafsky ✅
+Type: LOCATION
+
+Question 9
+Q: What is monolingual knowledge!Dan Jurafsky Faithfulness?
+
+Score: 0.76
+
+A. Different method
+B. Alternative approach
+C. Related concept
+D. monolingual knowledge!Dan Jurafsky Faithfulness ✅
+Type: CONCEPT
+
+Question 10
+Q: What is Candidate 2 Unigram Precision?
+
+Score: 0.98
+
+A. Microsoft Corp.
+B. Apple Inc.
+C. Google LLC
+D. Candidate 2 Unigram Precision ✅
+Type: ORGANIZATION
+
+Frequently Asked Questions
+Question 1
+Q: What is the green witch?
+
+A: the green witch
+
+📖 Additional Context
+
+Type: CONCEPT
+
+Question 2
+Q: What is 63Maria nodiounabofetada?
+
+A: 63Maria nodiounabofetada
+
+📖 Additional Context
+
+Type: ORGANIZATION
+
+Question 3
+Q: What is partial translation •Mark foreign words?
+
+A: partial translation •Mark foreign words
+
+📖 Additional Context
+
+Type: CONCEPT
+
+Question 4
+Q: What is Philipp KoehnDan Jurafsky Decoding?
+
+A: Philipp KoehnDan Jurafsky Decoding
+
+📖 Additional Context
+
+Type: CONCEPT
+
+Question 5
+Q: What is bitextDan Jurafsky?
+
+A: bitextDan Jurafsky
+
+📖 Additional Context
+
+Type: LOCATION
+
+Question 6
+Q: What is monolingual knowledge!Dan Jurafsky Faithfulness?
+
+A: monolingual knowledge!Dan Jurafsky Faithfulness
+
+📖 Additional Context
+
+Type: CONCEPT
+
+Question 7
+Q: What is Candidate 2 Unigram Precision?
+
+A: Candidate 2 Unigram Precision
+
+📖 Additional Context
+
+Type: ORGANIZATION
+
+these were the questions generated... mostly are same, no variety in various sections... and also... most of them are useless... i am also attaching the actual pdf...
+
+our questions answer generations is not working at all... its not context aware or intelligent.... i want to know the actual problem and then a well designed prompt for the coding agent to start working towards improving the code and fixing this

@@ -1,0 +1,465 @@
+You are a senior NLP engineer working on an academic AI project:
+
+# Project:
+
+AI-Powered Document Assessment & Intelligent Question Generation System
+
+The current system pipeline already exists and includes:
+
+* PDF/Text extraction
+* Preprocessing
+* Sentence ranking
+* Answer extraction
+* Question generation using fine-tuned T5
+* MCQ generation
+* Streamlit dashboard
+
+HOWEVER, the generated questions are currently poor quality.
+
+Examples of current failures:
+
+* "What is xor eax?"
+* "What is bitextDan Jurafsky?"
+* "What is Candidate 2 Unigram Precision?"
+* meaningless OCR fragments
+* duplicated author names
+* corrupted phrases from PDF extraction
+* generic fallback questions dominating output
+
+The system is technically functional but lacks semantic intelligence.
+
+Your task is NOT to rebuild the project.
+
+Your task is to implement a major QUALITY REFINEMENT phase focused on:
+
+1. PDF cleanup
+2. Semantic filtering
+3. Educational relevance
+4. Context-aware question generation
+5. Better distractor quality
+6. Reducing fallback usage
+
+IMPORTANT:
+Do NOT break existing architecture.
+Improve quality while preserving modularity.
+
+---
+
+# GOAL
+
+---
+
+Transform the system from:
+"template-based noisy question generator"
+
+into:
+"context-aware educational question generation system"
+
+The system should generate:
+
+* meaningful questions
+* concept-aware questions
+* educationally useful MCQs
+* semantically relevant answers
+
+---
+
+# PHASE 1 — ADVANCED PDF CLEANING
+
+---
+
+The current PDF extraction merges tokens incorrectly.
+
+Examples:
+
+* "Philipp KoehnDan Jurafsky"
+* "bitextDan Jurafsky"
+* "63Maria nodiounabofetada"
+
+This breaks downstream NLP.
+
+Implement a robust PDF/text cleaning layer.
+
+Requirements:
+
+1. Remove repeated slide artifacts:
+
+* author names repeated across pages
+* slide titles repeated every page
+* page numbers
+* isolated symbols
+
+2. Fix merged-token artifacts:
+   Examples:
+
+* "KoehnDan" → "Koehn Dan"
+* "bitextDan" → "bitext Dan"
+
+Use regex-based spacing repair:
+
+* detect lowercase-uppercase merges
+* detect numeric-text merges
+
+3. Remove OCR noise:
+   Reject lines containing:
+
+* excessive symbols
+* corrupted unicode
+* random numeric fragments
+* malformed tokens
+
+4. Remove presentation-specific noise:
+   Examples:
+
+* standalone headers
+* repeated footer names
+* isolated equations without explanation
+* slide duplicates
+
+5. Normalize whitespace aggressively.
+
+Create:
+preprocessing/text_cleaner.py
+
+Functions:
+
+* clean_extracted_text()
+* remove_slide_noise()
+* repair_merged_tokens()
+* normalize_text()
+
+---
+
+# PHASE 2 — SEMANTIC ANSWER QUALITY FILTER
+
+---
+
+Current answer extraction accepts meaningless phrases.
+
+BAD examples:
+
+* "xor eax"
+* "mov ecx"
+* "the introduction"
+* "bitextDan Jurafsky"
+
+This must stop.
+
+Implement:
+generation/answer_quality_filter.py
+
+Create:
+is_valid_answer(answer, context)
+
+The system must reject:
+
+* OCR artifacts
+* assembly/code fragments
+* generic phrases
+* stopword-heavy chunks
+* malformed entities
+* duplicate repeated tokens
+* slide metadata
+* author names
+* phrases with excessive symbols
+* extremely short meaningless phrases
+
+---
+
+# REQUIRED HEURISTICS
+
+---
+
+Reject if:
+
+* token count < 2 OR > 8
+* starts with:
+  "the", "a", "an"
+* contains repeated words
+* contains excessive punctuation
+* contains mostly uppercase/random chars
+* contains assembly/code keywords:
+  eax, ebx, mov, xor, ret, addr, sfp, etc.
+* contains malformed OCR text
+* low alphabetic ratio
+* low semantic score
+
+Reject answers if:
+spaCy POS pattern lacks meaningful nouns/concepts.
+
+---
+
+# PHASE 3 — EDUCATIONAL CONCEPT DETECTION
+
+---
+
+IMPORTANT:
+Do NOT treat every noun phrase as educational content.
+
+Instead detect:
+
+* definitions
+* concepts
+* processes
+* algorithms
+* comparisons
+* causes/effects
+* evaluation metrics
+* model descriptions
+
+GOOD examples from document:
+
+* Statistical Machine Translation
+* IBM Model 1
+* BLEU score
+* Word Alignment
+* Phrase-based Translation
+* EM Algorithm
+
+BAD examples:
+
+* Dan Jurafsky
+* Candidate 2
+* green witch
+* Mary
+
+Implement:
+extract_educational_concepts()
+
+Use:
+
+* dependency parsing
+* noun phrase analysis
+* sentence structure
+* keyword patterns
+
+Prioritize sentences containing:
+
+* "is"
+* "defined as"
+* "used for"
+* "consists of"
+* "algorithm"
+* "model"
+* "process"
+* "evaluation"
+* "translation"
+* "probability"
+
+---
+
+# PHASE 4 — CONTEXT-AWARE QUESTION GENERATION
+
+---
+
+Current system mostly generates:
+"What is X?"
+
+This is unacceptable.
+
+Implement dynamic question generation.
+
+The question should depend on sentence meaning.
+
+---
+
+# QUESTION TYPES
+
+---
+
+Generate different question styles:
+
+1. Definition:
+   "What is BLEU in machine translation?"
+
+2. Purpose:
+   "What is the purpose of a language model in SMT?"
+
+3. Process:
+   "How does IBM Model 1 compute alignments?"
+
+4. Comparison:
+   "What is the difference between fluency and faithfulness?"
+
+5. Cause/Effect:
+   "Why is perfect translation impossible?"
+
+6. Algorithmic:
+   "What are the steps in the EM algorithm?"
+
+---
+
+# IMPLEMENTATION REQUIREMENTS
+
+---
+
+1. Use sentence context heavily.
+
+2. Infer question type from:
+
+* dependency structure
+* keywords
+* semantic roles
+
+3. Improve T5 prompting:
+   Use prompts like:
+   "generate an educational question:"
+
+instead of:
+"generate a question"
+
+4. Use beam search:
+   num_beams=5
+   num_return_sequences=3
+
+5. Select best generated question using:
+
+* semantic similarity
+* fluency
+* question validity
+* diversity
+
+---
+
+# PHASE 5 — QUESTION VALIDATION
+
+---
+
+Implement:
+is_valid_question(question, answer)
+
+Reject:
+
+* trivial echo questions
+* questions containing exact answer phrase
+* malformed grammar
+* overly short questions
+* duplicate questions
+
+BAD:
+"What is BLEU?"
+when answer is BLEU
+
+GOOD:
+"What metric is commonly used to evaluate machine translation systems?"
+
+---
+
+# PHASE 6 — IMPROVED MCQ DISTRACTORS
+
+---
+
+Current distractors are terrible:
+
+* "Different method"
+* "Alternative approach"
+
+This must be fixed.
+
+Generate distractors using:
+
+1. same semantic category
+2. nearby educational concepts
+3. embedding similarity
+4. context-aware alternatives
+
+Examples:
+Question: What metric evaluates MT quality?
+
+Correct:
+BLEU
+
+Distractors:
+
+* METEOR
+* NIST
+* TER
+
+NOT:
+
+* Different method
+
+---
+
+# PHASE 7 — OUTPUT DIVERSITY
+
+---
+
+Ensure:
+
+* no duplicate questions
+* balanced question styles
+* multiple difficulty levels
+* educational usefulness
+
+Avoid:
+10 identical "What is X?" questions
+
+---
+
+# PHASE 8 — LOGGING & DEBUGGING
+
+---
+
+Add detailed logging:
+
+Log:
+
+* rejected answers
+* reason for rejection
+* raw T5 outputs
+* selected question type
+* fallback usage count
+
+IMPORTANT:
+Track fallback percentage.
+
+Goal:
+Fallback usage should become LOW.
+
+---
+
+# FINAL GOAL
+
+---
+
+The refined system should produce outputs like:
+
+GOOD:
+
+* "What is the role of the language model in statistical machine translation?"
+* "How does IBM Model 1 perform word alignment?"
+* "Why is BLEU considered a precision-based metric?"
+* "What are the steps involved in phrase extraction?"
+
+BAD:
+
+* "What is Mary?"
+* "What is xor eax?"
+* "What is Candidate 2 Unigram Precision?"
+
+---
+
+# OUTPUT REQUIREMENTS
+
+---
+
+Provide:
+
+1. Modified modules
+2. New utility modules
+3. Clear explanations
+4. Modular architecture
+5. Updated pipeline flow
+6. Logging improvements
+7. Example outputs before vs after
+
+DO NOT:
+
+* remove existing architecture
+* replace whole pipeline
+* hardcode concepts
+* use external APIs
+
+Focus on:
+semantic intelligence + educational relevance + robust preprocessing.

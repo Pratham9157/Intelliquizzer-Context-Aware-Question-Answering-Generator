@@ -1,0 +1,488 @@
+You are a senior AI/NLP systems engineer.
+
+I already have a working academic project:
+
+# CURRENT PROJECT
+
+AI-Powered Document Assessment & Question Generation System
+
+Current features:
+
+* Streamlit dashboard
+* PDF/TXT processing
+* sentence ranking
+* answer extraction
+* question generation
+* MCQ generation
+* FAQ generation
+* local fine-tuned T5
+* distractor generation
+* partial RAG support
+
+However, the current pipeline suffers from:
+
+* noisy PDF extraction
+* poor semantic filtering
+* weak question quality
+* overuse of fallback questions
+* malformed extracted concepts
+* poor distractor quality
+* lecture-slide corruption issues
+
+I now want to TRANSFORM the project into the architecture/style of:
+
+# 🔥 IntelliQuizzer v4
+
+The uploaded project structure is the target reference architecture.
+
+IMPORTANT:
+Do NOT blindly overwrite everything.
+Instead:
+
+* preserve working infrastructure
+* replace weak components carefully
+* migrate architecture cleanly
+
+---
+
+# MAIN GOAL
+
+---
+
+Transform the current project into:
+
+# "Context-Aware Educational Question Generation and RAG Assistant"
+
+The final system should:
+
+* understand educational documents
+* generate intelligent questions
+* build high-quality MCQs
+* support semantic querying (RAG)
+* run 100% locally
+* avoid noisy extraction
+* avoid trivial “What is X?” generation
+
+---
+
+# IMPORTANT ENGINEERING RULES
+
+---
+
+* Do NOT rewrite everything from scratch
+* Preserve working Streamlit structure where possible
+* Preserve modular architecture
+* Replace weak modules incrementally
+* Keep project maintainable
+* Ensure local-only execution
+* No paid APIs
+* No OpenAI dependency
+
+---
+
+# TARGET ARCHITECTURE
+
+---
+
+Refactor project into:
+
+project/
+├── app.py
+├── requirements.txt
+├── download_models.py
+├── pipeline/
+│   ├── text_extractor.py
+│   ├── preprocessor.py
+│   ├── sentence_ranker.py
+│   ├── answer_extractor.py
+│   ├── question_generator.py
+│   ├── distractor_generator.py
+│   ├── mcq_builder.py
+│   ├── orchestrator.py
+├── rag/
+│   ├── retriever.py
+│   ├── embedder.py
+│   ├── vector_store.py
+│   ├── rag_pipeline.py
+├── utils/
+│   ├── exporter.py
+│   ├── cleaners.py
+│   ├── validators.py
+
+---
+
+# PHASE 1 — REPLACE PDF EXTRACTION PIPELINE
+
+---
+
+Current extraction quality is poor.
+
+Examples of failures:
+
+* "bitextDan Jurafsky"
+* "KoehnDan"
+* "63Maria nodiounabofetada"
+
+Replace extraction logic with:
+
+* PyMuPDF (fitz)
+* layout-aware extraction
+* better whitespace preservation
+
+Implement:
+pipeline/text_extractor.py
+
+Requirements:
+
+* remove repeated slide footers
+* remove repeated headers
+* repair merged tokens
+* clean OCR artifacts
+* support:
+
+  * PDF
+  * TXT
+  * PPTX (optional)
+
+Add:
+
+* slide-aware cleaning
+* repeated-line detection
+* token repair logic
+
+---
+
+# PHASE 2 — REBUILD ANSWER EXTRACTION
+
+---
+
+Current noun-chunk extraction is weak.
+
+Replace with:
+
+# Hybrid Educational Answer Extraction
+
+Use:
+
+1. Pattern-based extraction
+2. BERT NER
+3. Subject extraction
+4. Educational concept detection
+
+Model:
+dslim/bert-base-NER
+
+Implement:
+pipeline/answer_extractor.py
+
+IMPORTANT:
+Reject:
+
+* code fragments
+* malformed OCR phrases
+* author names
+* isolated entities
+* verb-heavy fragments
+* repeated tokens
+
+---
+
+# REQUIRED EDUCATIONAL PATTERNS
+
+---
+
+Detect:
+
+* definitions
+* algorithms
+* methods
+* metrics
+* models
+* processes
+* cause/effect relationships
+
+Patterns:
+
+* "X is ..."
+* "known as"
+* "used for"
+* "consists of"
+* "defined as"
+* "algorithm"
+* "metric"
+* "model"
+
+---
+
+# PHASE 3 — REPLACE QUESTION GENERATION
+
+---
+
+Current fallback-heavy T5 pipeline is weak.
+
+Replace with:
+valhalla/t5-base-qg-hl
+
+Implement:
+pipeline/question_generator.py
+
+Use highlight-style prompting:
+
+Example:
+"context <hl> BLEU score <hl> is used to evaluate machine translation."
+
+Generate:
+"What metric is commonly used to evaluate machine translation systems?"
+
+---
+
+# REQUIREMENTS
+
+---
+
+1. Use beam search:
+
+* num_beams=5
+* num_return_sequences=3
+
+2. Rank generated questions by:
+
+* fluency
+* semantic relevance
+* diversity
+* grammatical correctness
+
+3. Reject:
+
+* trivial echo questions
+* malformed questions
+* answer-copy questions
+
+BAD:
+"What is BLEU?"
+
+GOOD:
+"What metric evaluates machine translation quality?"
+
+---
+
+# PHASE 4 — REBUILD DISTRACTOR GENERATION
+
+---
+
+Current distractors are generic.
+
+Replace with:
+
+# Semantic Cluster-Based Distractors
+
+Implement:
+pipeline/distractor_generator.py
+
+Use:
+sentence-transformers/all-MiniLM-L6-v2
+
+Requirements:
+
+* retrieve semantically similar concepts
+* same answer type
+* structural similarity
+* capitalization consistency
+* same token-length bucket
+
+GOOD:
+BLEU → METEOR / TER / NIST
+
+BAD:
+Different method / Option A
+
+---
+
+# PHASE 5 — ADD MCQ QUALITY FILTER
+
+---
+
+Implement:
+pipeline/mcq_builder.py
+
+Reject MCQs if:
+
+* answer appears directly in question
+* all options too similar
+* question too short
+* distractors meaningless
+
+Build:
+2× candidate buffer
+then filter best MCQs.
+
+---
+
+# PHASE 6 — ORCHESTRATOR
+
+---
+
+Implement:
+pipeline/orchestrator.py
+
+This module should:
+
+1. extract text
+2. preprocess
+3. rank sentences
+4. extract answers
+5. generate questions
+6. generate distractors
+7. assemble MCQs
+8. return structured output
+
+---
+
+# PHASE 7 — LOCAL RAG
+
+---
+
+Implement:
+rag/
+
+Use:
+
+* FAISS
+* sentence-transformers
+* RoBERTa QA
+
+Capabilities:
+
+* semantic retrieval
+* local document QA
+* contextual answering
+
+IMPORTANT:
+No internet dependency.
+
+---
+
+# PHASE 8 — STREAMLIT UI UPGRADE
+
+---
+
+Upgrade UI into:
+
+# Educational AI Assistant Dashboard
+
+Tabs:
+
+1. MCQ Generation
+2. Short Answer Questions
+3. FAQs
+4. Ask Questions (RAG)
+5. Export
+
+Add:
+
+* retrieved context display
+* source chunk display
+* answer confidence
+* semantic similarity scores
+
+---
+
+# PHASE 9 — EXPORT SYSTEM
+
+---
+
+Implement:
+utils/exporter.py
+
+Support:
+
+* TXT
+* JSON
+* CSV
+* Anki cards
+* Moodle GIFT format
+
+---
+
+# PHASE 10 — MODEL MANAGEMENT
+
+---
+
+Create:
+download_models.py
+
+Pre-download:
+
+* dslim/bert-base-NER
+* valhalla/t5-base-qg-hl
+* all-MiniLM-L6-v2
+* deepset/roberta-base-squad2
+
+Ensure:
+offline/local execution.
+
+---
+
+# PHASE 11 — LOGGING & DEBUGGING
+
+---
+
+Add detailed logs:
+
+* rejected answers
+* rejected questions
+* fallback count
+* retrieval confidence
+* extraction statistics
+
+Track:
+
+* quality metrics
+* fallback percentage
+* semantic filtering statistics
+
+---
+
+# PHASE 12 — EXPECTED OUTPUT QUALITY
+
+---
+
+GOOD:
+
+* "What metric evaluates machine translation quality?"
+* "How does IBM Model 1 perform alignment?"
+* "What is the role of language models in SMT?"
+
+BAD:
+
+* "What is BLEU?"
+* "What is xor eax?"
+* "What is Dan Jurafsky?"
+
+---
+
+# OUTPUT REQUIREMENTS
+
+---
+
+Provide:
+
+1. migration plan
+2. updated folder structure
+3. modified modules
+4. newly added modules
+5. integration steps
+6. dependency changes
+7. setup instructions
+8. compatibility fixes
+9. testing scripts
+
+DO NOT:
+
+* hardcode concepts
+* use paid APIs
+* remove modularity
+* destroy existing UI structure
+
+Focus on:
+semantic intelligence + educational usefulness + robust local AI pipeline.

@@ -1,0 +1,228 @@
+You are a senior NLP engineer implementing a Transformer-based Question Generation system.
+
+We are building:
+“Context-Aware Automatic Question Generation using Transformer-based Sequence Modeling”
+
+Modules 1–4 are already completed:
+
+* Text extraction
+* Preprocessing
+* Sentence ranking
+* Answer extraction
+
+Now implement:
+
+---
+
+# 🧩 MODULE 5 — QUESTION GENERATION MODULE
+
+## 🎯 OBJECTIVE
+
+Generate high-quality questions from:
+
+* Sentence (context)
+* Extracted answer
+
+The system must generate:
+
+* Short answer questions
+* Optionally: MCQs (with distractors later)
+
+---
+
+## ⚠️ IMPLEMENTATION RULES
+
+* Use T5-small from HuggingFace
+* DO NOT train from scratch
+* Fine-tuning should be optional
+* Focus on input formatting (VERY IMPORTANT)
+* Keep code modular and clean
+* Ensure output is meaningful and grammatically correct
+
+---
+
+## 📁 FILE LOCATION
+
+Create:
+
+generation/question_generator.py
+
+---
+
+## 🧠 FUNCTIONAL REQUIREMENTS
+
+---
+
+### 1. Model Loading
+
+Implement:
+
+```python
+load_model(model_name="t5-small")
+```
+
+* Load tokenizer + model
+* Use:
+
+  * transformers.T5Tokenizer
+  * transformers.T5ForConditionalGeneration
+
+---
+
+### 2. Input Formatting (CRITICAL PART)
+
+Implement:
+
+```python
+format_input(answer: str, context: str) -> str
+```
+
+Format EXACTLY like:
+
+```text
+generate question: answer: {answer} context: {context}
+```
+
+Example:
+
+```text
+generate question: answer: Albert Einstein context: Albert Einstein developed relativity.
+```
+
+---
+
+### 3. Question Generation Function
+
+```python
+generate_question(answer: str, context: str) -> str
+```
+
+Steps:
+
+1. Format input
+2. Tokenize
+3. Generate output using model.generate()
+
+Use:
+
+* max_length=64
+* num_beams=4
+* early_stopping=True
+
+Decode output
+
+---
+
+### 4. Batch Question Generation
+
+```python
+generate_questions(answer_dict: Dict[str, List[Dict]]) -> Dict
+```
+
+Input:
+
+```python
+{
+  sentence: [
+    {"answer": "...", "type": "..."},
+    ...
+  ]
+}
+```
+
+Output:
+
+```python
+{
+  sentence: [
+    {
+      "question": "...",
+      "answer": "...",
+      "type": "...",
+      "score": ...
+    }
+  ]
+}
+```
+
+---
+
+### 5. Post-processing (IMPORTANT)
+
+Implement:
+
+```python
+clean_question(question: str) -> str
+```
+
+* Capitalize first letter
+* Ensure it ends with '?'
+* Remove duplicates/spaces
+
+---
+
+### 6. Basic Question Type Control (OPTIONAL BONUS)
+
+Use answer type:
+
+* PERSON → "Who"
+* LOCATION → "Where"
+* DATE → "When"
+
+(Optional: modify prompt slightly)
+
+---
+
+## 🧪 TESTING
+
+Implement:
+
+```python
+test_question_generator()
+```
+
+Test:
+
+* Single sentence
+* Multiple answers
+* Different answer types
+
+Print:
+
+* Context
+* Answer
+* Generated question
+
+---
+
+## 📌 OUTPUT FORMAT
+
+Provide:
+
+1. File name
+2. Full code
+3. Explanation:
+
+   * T5 usage
+   * Input formatting importance
+   * Generation strategy
+4. Example outputs
+
+---
+
+## 🚫 DO NOT
+
+* Do NOT use APIs (OpenAI etc.)
+* Do NOT skip input formatting
+* Do NOT overcomplicate
+* Do NOT merge with other modules
+
+---
+
+## 🎯 GOAL
+
+Build a clean, controlled, and high-quality question generation system using transformers that integrates seamlessly with previous modules.
+
+---
+
+After completing, STOP and wait for further instructions.
