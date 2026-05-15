@@ -97,13 +97,33 @@ class WebRetriever:
     def retrieve(self, query: str, max_results: int = 3) -> str:
         results = self.search(query, max_results=max_results)
         parts: List[str] = []
+        query_words = set(re.findall(r'\b\w+\b', query.lower()))
+        
         for r in results:
-            if r.get('snippet'):
-                parts.append(f"[{r['title']}]: {r['snippet']}")
+            snippet = r.get('snippet', '')
+            snippet_words = set(re.findall(r'\b\w+\b', snippet.lower()))
+            
+            # Calculate relevance: how many query words are in the snippet
+            common_words = {'what', 'is', 'the', 'a', 'an', 'how', 'why', 'where', 'when', 'are', 'does'}
+            query_words_filtered = query_words - common_words
+            
+            if query_words_filtered:
+                relevance = len(query_words_filtered & snippet_words) / len(query_words_filtered)
+                # Only include snippet if it has reasonable relevance (>30%)
+                if relevance > 0.3 and snippet:
+                    parts.append(f"[{r['title']}]: {snippet}")
+            
+            # Fetch full page with relevance check
             if r.get('url'):
                 page = self.fetch_page(r['url'])
                 if page:
-                    parts.append(page)
+                    page_words = set(re.findall(r'\b\w+\b', page.lower()))
+                    if query_words_filtered:
+                        page_relevance = len(query_words_filtered & page_words) / len(query_words_filtered)
+                        # Only include if >20% of key words found in page
+                        if page_relevance > 0.2:
+                            parts.append(page)
+        
         return '\n\n'.join(parts)[:5000]
 
 
@@ -113,26 +133,66 @@ class QAAgent:
         _get_qa()
         logger.info("QAAgent initialised (local RoBERTa)")
 
+    def _extract_relevant_doc_sections(self, question: str, document_text: str, 
+                                       num_sections: int = 3) -> str:
+        """Extract most relevant sentences from document based on question."""
+        if not document_text.strip():
+            return ''
+        
+        # Split into sentences
+        sentences = re.split(r'(?<=[.!?])\s+', document_text)
+        sentences = [s.strip() for s in sentences if len(s.strip()) > 20]
+        
+        if not sentences:
+            return document_text[:2000]
+        
+        # Score sentences by word overlap with question
+        q_words = set(re.findall(r'\b\w+\b', question.lower()))
+        scored = []
+        for sent in sentences:
+            sent_words = set(re.findall(r'\b\w+\b', sent.lower()))
+            # Exclude common words
+            q_words_filtered = q_words - {'is', 'the', 'a', 'an', 'what', 'how', 'why', 'where', 'when', 'who'}
+            overlap = len(q_words_filtered & sent_words)
+            if overlap > 0:
+                scored.append((overlap, sent))
+        
+        if not scored:
+            return document_text[:2000]
+        
+        # Return top relevant sentences
+        scored.sort(reverse=True, key=lambda x: x[0])
+        relevant = ' '.join([s[1] for s in scored[:num_sections]])
+        return relevant[:2500]
+
     def answer(self, question: str, document_text: str = '',
                use_web: bool = True) -> Dict:
-        web_ctx = ''
         sources: List[str] = []
+        doc_ctx = ''
+        web_ctx = ''
 
+        # First, extract relevant sections from document if available
+        if document_text.strip():
+            doc_ctx = self._extract_relevant_doc_sections(question, document_text, num_sections=5)
+        
+        # Always try web search if enabled (RAG should augment, not replace)
         if use_web:
             results = self._retriever.search(question, max_results=4)
             sources = [r['url'] for r in results if r.get('url')]
             web_ctx = self._retriever.retrieve(question, max_results=3)
 
+        # Combine: document first (higher priority), then web
         parts: List[str] = []
-        if document_text.strip():
-            parts.append(document_text[:3000])
+        if doc_ctx:
+            parts.append(doc_ctx)
         if web_ctx:
             parts.append(web_ctx)
+        
         context = ' '.join(parts).strip()
 
         if not context:
-            return {'answer': 'No context available.', 'sources': sources,
-                    'used_web': bool(web_ctx), 'score': 0.0}
+            return {'answer': 'No relevant information found. Try enabling web search or uploading a document.', 
+                    'sources': sources, 'used_web': bool(web_ctx), 'score': 0.0}
 
         pipe = _get_qa()
         if pipe is None:
@@ -143,9 +203,10 @@ class QAAgent:
             result = pipe(question=question, context=context[:4096])
             answer_text = result['answer'].strip()
             score = round(result['score'], 4)
+            
             if score < 0.05:
                 answer_text += (f"\n\n*(Low confidence — {score:.0%}. "
-                                f"The context may not contain a direct answer.)*")
+                                f"The answer may not be clear from available context.)*")
         except Exception as e:
             logger.error(f"QA error: {e}")
             answer_text = _keyword_fallback(question, context)

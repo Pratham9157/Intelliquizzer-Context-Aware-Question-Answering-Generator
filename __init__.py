@@ -1,7 +1,6 @@
 """
 IntelliQuizzer v4 — Context-Aware Automatic Question Generation
 ================================================================
-100% local. No API keys. Python 3.11 required.
 
 Quick start:
     from intelliquizzer.pipeline import IntelliQuizzerPipeline

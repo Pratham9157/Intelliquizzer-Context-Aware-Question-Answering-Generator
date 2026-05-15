@@ -1,15 +1,14 @@
 # 🧠 IntelliQuizzer v4
 
-**Context-Aware Automatic Question Generation — 100% Local, Zero API Keys**
+**Context-Aware Automatic Question Generation**
 
 ---
 
 ## 📚 Project Overview
 
-IntelliQuizzer is an advanced **Automatic Multiple Choice Question (MCQ) Generation System** that transforms documents into high-quality quiz content. Unlike cloud-based solutions, it runs entirely on your machine with zero API dependencies.
+IntelliQuizzer is an advanced **Automatic Multiple Choice Question (MCQ) Generation System** that transforms documents into high-quality quiz content.
 
 ### Key Features
-- ✅ **100% Local** — No internet required, no API keys, privacy guaranteed
 - 🎯 **Context-Aware** — Extracts meaningful answers and generates relevant questions
 - 🔧 **Multi-Format Support** — PDF, PPTX, TXT files
 - 💾 **Multiple Export Formats** — TXT, CSV, JSON, Anki, GIFT

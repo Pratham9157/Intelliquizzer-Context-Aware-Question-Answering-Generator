@@ -1,7 +1,6 @@
 """
 IntelliQuizzer — Streamlit UI
 ==============================
-100% local — no API keys required.
 
 Tabs:
   1. Generate MCQs  — full pipeline from text / PDF / PPTX
@@ -33,73 +32,77 @@ st.markdown("""
 <style>
 [data-testid="stAppViewContainer"]{background:#0d1117}
 [data-testid="stSidebar"]{background:#161b22;border-right:1px solid #30363d}
-h1,h2,h3{color:#e6edf3!important}
-p,label,div,span{color:#8b949e}
+h1,h2,h3{color:#ffffff!important;margin-bottom:16px!important}
+p,label,div,span{color:#e6edf3}
 
-.iq-card{background:#161b22;border:1px solid #30363d;border-radius:10px;
-          padding:20px 24px;margin-bottom:14px;transition:border-color .2s}
-.iq-card:hover{border-color:#58a6ff}
+.iq-card{background:#161b22;border:1px solid #30363d;border-radius:12px;
+          padding:20px;margin-bottom:12px;transition:all .2s;
+          box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.iq-card:hover{border-color:#58a6ff;box-shadow:0 4px 12px rgba(88,166,255,.1)}
 
-.q-num{background:#1f6feb;color:#e6edf3;border-radius:50%;
-        width:32px;height:32px;display:inline-flex;align-items:center;
-        justify-content:center;font-weight:700;font-size:13px;margin-right:10px;
+.q-num{background:#1f6feb;color:#ffffff;border-radius:50%;
+        width:36px;height:36px;display:inline-flex;align-items:center;
+        justify-content:center;font-weight:700;font-size:13px;margin-right:12px;
         flex-shrink:0}
-.q-text{color:#e6edf3;font-size:15px;font-weight:600;line-height:1.5}
+.q-text{color:#ffffff;font-size:16px;font-weight:500;line-height:1.6}
 
-.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;
-       text-transform:uppercase;letter-spacing:.5px;margin-left:5px}
+.badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;
+       text-transform:uppercase;letter-spacing:.4px;margin-left:6px}
 .b-easy{background:#0d4429;color:#3fb950}
 .b-medium{background:#3d2c00;color:#d29922}
 .b-hard{background:#3d0c0c;color:#f85149}
 .b-factual{background:#0c2d6b;color:#58a6ff}
 .b-conceptual{background:#2d1a4d;color:#bc8cff}
 .b-analytical{background:#1a2d4d;color:#79c0ff}
-.b-local{background:#0d3322;color:#3fb950}
 
-.opt{padding:8px 14px;margin:4px 0;border-radius:7px;border:1px solid #30363d;
-     color:#8b949e;font-size:13.5px;display:flex;align-items:center;gap:10px}
+.opt{padding:10px 14px;margin:6px 0;border-radius:8px;border:1px solid #30363d;
+     color:#e6edf3;font-size:14px;display:flex;align-items:center;gap:10px;
+     transition:all .15s;background:#0d1117}
 .opt-correct{background:#0d3322;border-color:#3fb950;color:#3fb950;font-weight:600}
-.opt-letter{font-weight:700;min-width:20px;color:#484f58;font-size:13px}
+.opt-letter{font-weight:700;min-width:20px;color:#58a6ff;font-size:13px}
 .opt-correct .opt-letter{color:#3fb950}
 
-.expl{background:#161b22;border-left:3px solid #1f6feb;padding:9px 13px;
-      border-radius:0 7px 7px 0;margin-top:10px;font-size:12.5px;color:#8b949e}
+.expl{background:#0d1117;border-left:3px solid #1f6feb;padding:10px 14px;
+      border-radius:0 8px 8px 0;margin-top:12px;font-size:13px;color:#c9d1d9}
 
-.stat-grid{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
-.stat-box{background:#161b22;border:1px solid #30363d;border-radius:9px;
-           padding:14px 18px;flex:1;min-width:90px;text-align:center}
-.stat-n{font-size:26px;font-weight:700;color:#1f6feb}
-.stat-l{font-size:11px;color:#484f58;margin-top:2px}
+.stat-grid{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0}
+.stat-box{background:#0d1117;border:1px solid #30363d;border-radius:10px;
+           padding:16px;flex:1;min-width:100px;text-align:center;transition:all .2s}
+.stat-box:hover{border-color:#58a6ff;background:#161b22}
+.stat-n{font-size:28px;font-weight:700;color:#1f6feb}
+.stat-l{font-size:11px;color:#c9d1d9;margin-top:4px;text-transform:uppercase;letter-spacing:.4px;font-weight:500}
 
-.pipeline-stage{background:#161b22;border:1px solid #30363d;border-radius:8px;
-                 padding:10px 16px;margin:4px 0;font-size:13px;color:#8b949e}
+.pipeline-stage{background:#0d1117;border-left:3px solid #1f6feb;border-radius:6px;
+                 padding:12px 14px;margin:6px 0;font-size:13px;color:#c9d1d9;font-weight:500}
 
-.quiz-opt{padding:11px 16px;margin:6px 0;border-radius:8px;cursor:pointer;
-           border:1px solid #30363d;color:#8b949e;font-size:14px;
-           transition:border-color .15s,background .15s}
-.quiz-opt:hover{border-color:#58a6ff;color:#e6edf3}
+.quiz-opt{padding:12px 16px;margin:8px 0;border-radius:8px;cursor:pointer;
+           border:1px solid #30363d;color:#e6edf3;font-size:14px;background:#0d1117;
+           transition:all .15s;font-weight:500}
+.quiz-opt:hover{border-color:#58a6ff;color:#ffffff;background:#161b22}
 .quiz-correct{background:#0d3322;border-color:#3fb950!important;color:#3fb950!important}
 .quiz-wrong{background:#3d0c0c;border-color:#f85149!important;color:#f85149!important}
-.quiz-score{font-size:48px;font-weight:700;color:#3fb950;text-align:center}
+.quiz-score{font-size:52px;font-weight:700;color:#3fb950;text-align:center;margin:20px 0}
 
-.ans-box{background:#161b22;border:1px solid #30363d;border-radius:10px;
-          padding:20px;margin-top:12px}
+.ans-box{background:#0d1117;border:1px solid #30363d;border-radius:12px;
+          padding:20px;margin-top:16px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .web-badge{display:inline-block;background:#0c2d6b;color:#58a6ff;
-            border:1px solid #1f6feb;border-radius:20px;padding:2px 9px;
-            font-size:10px;font-weight:700;text-transform:uppercase;margin-left:8px}
-.local-badge{display:inline-block;background:#0d3322;color:#3fb950;
-              border:1px solid #3fb950;border-radius:20px;padding:2px 9px;
-              font-size:10px;font-weight:700;text-transform:uppercase;margin-left:8px}
+            border:1px solid #1f6feb;border-radius:20px;padding:3px 10px;
+            font-size:10px;font-weight:700;text-transform:uppercase}
 
-.upload-hint{text-align:center;padding:30px;border:2px dashed #30363d;
-              border-radius:10px;color:#484f58;font-size:14px;margin-top:20px}
+.upload-hint{text-align:center;padding:40px 20px;border:2px dashed #30363d;
+              border-radius:12px;color:#c9d1d9;font-size:14px;margin-top:24px;
+              background:#0d1117;transition:all .2s;font-weight:500}
+.upload-hint:hover{border-color:#58a6ff;color:#e6edf3}
 
-.stButton>button{background:#1f6feb;color:#e6edf3;border:none;
-                   border-radius:7px;font-weight:600;transition:all .2s}
-.stButton>button:hover{background:#388bfd;transform:translateY(-1px)}
+.stButton>button{background:#1f6feb;color:#ffffff;border:none;
+                   border-radius:8px;font-weight:600;transition:all .2s;
+                   padding:10px 20px!important}
+.stButton>button:hover{background:#388bfd;transform:translateY(-1px);box-shadow:0 4px 12px rgba(56,139,253,.3)}
+.stButton>button:active{transform:translateY(0)}
 
-.model-info{background:#0c2d0c;border:1px solid #3fb950;border-radius:8px;
-             padding:10px 14px;font-size:12px;color:#3fb950;margin-bottom:12px}
+.model-info{background:#0c2d0c;border:1px solid #3fb950;border-radius:10px;
+             padding:14px;font-size:12.5px;color:#c9d1d9;margin-bottom:16px;
+             line-height:1.6;font-weight:500}
 </style>
 """, unsafe_allow_html=True)
 
@@ -207,13 +210,12 @@ def render_stats(mcqs):
 # ─────────────────────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown("## 🧠 IntelliQuizzer")
-    st.markdown("*Context-Aware AQG · 100% Local*")
+    st.markdown("*Context-Aware Question Generation*")
     st.markdown("---")
 
     # Model status banner
     st.markdown("""
     <div class="model-info">
-      ✅ <strong>Zero API keys required</strong><br>
       🤖 QG: T5-base (SQuAD fine-tuned)<br>
       🤖 QA: RoBERTa-base (SQuAD2)<br>
       📦 Models auto-download on first run
@@ -239,7 +241,7 @@ Input (PDF / PPT / Text)
     ↓ M4 Answer Extractor
        (NER + TF-IDF keywords)
     ↓ M5 Question Generator
-       (T5-base, local, FREE)
+       (T5-base)
     ↓ M6 Distractor Generator
        (corpus + semantic bank)
     ↓ M7 MCQ Builder
@@ -249,7 +251,7 @@ Output (TXT/CSV/JSON/Anki/GIFT)
 
 QA Tab:
     ↓ DuckDuckGo Web Retriever
-    ↓ RoBERTa QA (local, FREE)
+    ↓ RoBERTa QA
 ```
     """)
 
@@ -260,7 +262,7 @@ QA Tab:
 st.markdown(
     '<h1 style="text-align:center;margin-bottom:4px">🧠 IntelliQuizzer</h1>'
     '<p style="text-align:center;color:#484f58;margin-bottom:24px">'
-    'Context-Aware Automatic Question Generation · 100% Local · Zero API Keys</p>',
+    'Context-Aware Automatic Question Generation</p>',
     unsafe_allow_html=True
 )
 
@@ -282,11 +284,11 @@ with tab_gen:
 
         raw_text = ''
         if mode == "Paste Text":
-            raw_text = st.text_area("", height=280,
+            raw_text = st.text_area("Input text", height=280,
                 placeholder="Paste text from any source — articles, lecture notes, research papers…",
                 label_visibility="collapsed")
         else:
-            upl = st.file_uploader("", type=["pdf", "pptx", "ppt", "txt"],
+            upl = st.file_uploader("Upload file", type=["pdf", "pptx", "ppt", "txt"],
                                     label_visibility="collapsed")
             if upl:
                 from pipeline.text_extractor import extract as _extract
@@ -503,8 +505,7 @@ with tab_quiz:
 with tab_qa:
     st.markdown("### 💬 Ask Anything")
     st.markdown(
-        "Answers are extracted from your document and/or live web search using a "
-        "<span class='local-badge'>LOCAL</span> RoBERTa model — no API key needed.",
+        "Answers are extracted from your document and/or live web search using a RoBERTa model.",
         unsafe_allow_html=True
     )
 
@@ -529,7 +530,6 @@ with tab_qa:
     if st.session_state.qa_result:
         r = st.session_state.qa_result
         web_badge   = '<span class="web-badge">🌐 Web-enriched</span>' if r.get('used_web') else ''
-        local_badge = '<span class="local-badge">🤖 Local RoBERTa</span>'
         conf_str    = f"Confidence: {r.get('score', 0):.0%}" if r.get('score', 0) > 0 else ''
 
         st.markdown(f"""
@@ -538,7 +538,7 @@ with tab_qa:
             <span style="color:#e6edf3;font-weight:600">
               Q: {st.session_state.qa_question}
             </span>
-            <span>{local_badge}{web_badge}</span>
+            <span>{web_badge}</span>
           </div>
           <div style="color:#c9d1d9;line-height:1.7;white-space:pre-wrap">{r['answer']}</div>
           {'<div style="margin-top:8px;font-size:11px;color:#484f58">' + conf_str + '</div>' if conf_str else ''}
